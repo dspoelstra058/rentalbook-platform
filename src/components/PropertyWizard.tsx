@@ -555,36 +555,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
                 </div>
               ))}
             </div>
-                    {category.name}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {category.facilities.map((facility) => (
-                      <label
-                        key={facility.id}
-                        className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.facilities?.includes(facility.id) || false}
-                          onChange={(e) => {
-                            const currentFacilities = formData.facilities || [];
-                            if (e.target.checked) {
-                              updateFormData({ facilities: [...currentFacilities, facility.id] });
-                            } else {
-                              updateFormData({ 
-                                facilities: currentFacilities.filter(id => id !== facility.id) 
-                              });
-                            }
-                          }}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <span className="text-sm text-gray-700">{facility.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
             
             {formData.facilities && formData.facilities.length > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

@@ -117,6 +117,7 @@ export default {
   'wizard.localInfoDesc': 'Nabijgelegen diensten en attracties',
   'wizard.chooseTemplate': 'Sjabloon Kiezen',
   'wizard.chooseTemplateDesc': 'Selecteer ontwerp voor je informatieboek',
+  'wizard.chooseTemplateText': 'Kies een sjabloon voor je informatieboek:',
   'wizard.paymentPublish': 'Betaling & Publiceren',
   'wizard.paymentPublishDesc': 'Voltooi betaling om te publiceren',
   'wizard.propertyName': 'Accommodatienaam',

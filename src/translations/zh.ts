@@ -117,6 +117,7 @@ export default {
   'wizard.localInfoDesc': '附近的服务和景点',
   'wizard.chooseTemplate': '选择模板',
   'wizard.chooseTemplateDesc': '为您的信息手册选择设计',
+  'wizard.chooseTemplateText': '为您的信息手册选择模板：',
   'wizard.paymentPublish': '支付和发布',
   'wizard.paymentPublishDesc': '完成支付以发布',
   'wizard.propertyName': '房产名称',

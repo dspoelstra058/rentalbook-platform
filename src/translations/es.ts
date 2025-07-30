@@ -117,6 +117,7 @@ export default {
   'wizard.localInfoDesc': 'Servicios y atracciones cercanas',
   'wizard.chooseTemplate': 'Elegir Plantilla',
   'wizard.chooseTemplateDesc': 'Selecciona el diseño para tu libro de información',
+  'wizard.chooseTemplateText': 'Elige una plantilla para tu libro de información:',
   'wizard.paymentPublish': 'Pago y Publicación',
   'wizard.paymentPublishDesc': 'Completa el pago para publicar',
   'wizard.propertyName': 'Nombre de la Propiedad',

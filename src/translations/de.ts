@@ -117,6 +117,7 @@ export default {
   'wizard.localInfoDesc': 'Nahegelegene Dienstleistungen und Attraktionen',
   'wizard.chooseTemplate': 'Vorlage Wählen',
   'wizard.chooseTemplateDesc': 'Design für Ihr Informationsbuch auswählen',
+  'wizard.chooseTemplateText': 'Wählen Sie eine Vorlage für Ihr Informationsbuch:',
   'wizard.paymentPublish': 'Zahlung & Veröffentlichung',
   'wizard.paymentPublishDesc': 'Zahlung abschließen zum Veröffentlichen',
   'wizard.propertyName': 'Immobilienname',

@@ -35,47 +35,49 @@ const countries = [
 
 interface WizardStep {
   id: string;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   icon: React.ElementType;
 }
 
-const steps: WizardStep[] = [
-  {
-    id: 'basic',
-    title: 'Basic Information',
-    description: 'Property details and location',
-    icon: Home
-  },
-  {
-    id: 'content',
-    title: 'Property Content',
-    description: 'Description and guest instructions',
-    icon: FileText
-  },
-  {
-    id: 'local',
-    title: 'Local Information',
-    description: 'Nearby services and attractions',
-    icon: MapPin
-  },
-  {
-    id: 'template',
-    title: 'Choose Template',
-    description: 'Select design for your information book',
-    icon: Palette
-  },
-  {
-    id: 'payment',
-    title: 'Payment & Publish',
-    description: 'Complete payment to publish',
-    icon: CreditCard
-  }
-];
 
 export const PropertyWizard: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  
+  const steps: WizardStep[] = [
+    {
+      id: 'basic',
+      titleKey: 'wizard.basicInfo',
+      descriptionKey: 'wizard.basicInfoDesc',
+      icon: Home
+    },
+    {
+      id: 'content',
+      titleKey: 'wizard.propertyContent',
+      descriptionKey: 'wizard.propertyContentDesc',
+      icon: FileText
+    },
+    {
+      id: 'local',
+      titleKey: 'wizard.localInfo',
+      descriptionKey: 'wizard.localInfoDesc',
+      icon: MapPin
+    },
+    {
+      id: 'template',
+      titleKey: 'wizard.chooseTemplate',
+      descriptionKey: 'wizard.chooseTemplateDesc',
+      icon: Palette
+    },
+    {
+      id: 'payment',
+      titleKey: 'wizard.paymentPublish',
+      descriptionKey: 'wizard.paymentPublishDesc',
+      icon: CreditCard
+    }
+  ];
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<Property>>({
     name: '',
@@ -201,50 +203,50 @@ export const PropertyWizard: React.FC = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Property Description
+                {t('wizard.propertyDescription')}
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => updateFormData({ description: e.target.value })}
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Describe your property..."
+                placeholder={t('wizard.describeProperty')}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Check-in Instructions
+                {t('wizard.checkInInstructions')}
               </label>
               <textarea
                 value={formData.checkInInstructions}
                 onChange={(e) => updateFormData({ checkInInstructions: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="How should guests check in?"
+                placeholder={t('wizard.howCheckIn')}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                WiFi Password
+                {t('wizard.wifiPassword')}
               </label>
               <input
                 type="text"
                 value={formData.wifiPassword}
                 onChange={(e) => updateFormData({ wifiPassword: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="WiFi password for guests"
+                placeholder={t('wizard.wifiPasswordPlaceholder')}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                House Rules
+                {t('wizard.houseRules')}
               </label>
               <textarea
                 value={formData.houseRules}
                 onChange={(e) => updateFormData({ houseRules: e.target.value })}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Important rules for guests..."
+                placeholder={t('wizard.importantRules')}
               />
             </div>
           </div>
@@ -254,12 +256,11 @@ export const PropertyWizard: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-sm text-gray-600 mb-4">
-              Select local services and attractions to include in your information book:
+              {t('wizard.selectLocalServices')}
             </div>
             {filteredLocalInfo.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                No local information available for {formData.city}, {formData.country}.
-                Please ensure you've entered the correct city and country.
+                {t('wizard.noLocalInfo', { city: formData.city, country: formData.country })}
               </div>
             ) : (
               <div className="grid gap-4">
@@ -306,7 +307,7 @@ export const PropertyWizard: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-sm text-gray-600 mb-4">
-              Choose a template for your information book:
+              {t('wizard.chooseTemplateText')}
             </div>
             <div className="grid grid-cols-2 gap-4">
               {templates.map((template) => (
@@ -348,26 +349,26 @@ export const PropertyWizard: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h3 className="font-medium text-blue-900 mb-2">Ready to Publish</h3>
+              <h3 className="font-medium text-blue-900 mb-2">{t('wizard.readyToPublish')}</h3>
               <p className="text-sm text-blue-800">
-                Complete payment to generate your information book website and PDF.
+                {t('wizard.completePayment')}
               </p>
             </div>
             
             <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h4 className="font-medium text-gray-900 mb-4">Order Summary</h4>
+              <h4 className="font-medium text-gray-900 mb-4">{t('wizard.orderSummary')}</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span>Information Book Creation</span>
+                  <span>{t('wizard.bookCreation')}</span>
                   <span>€29.99</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Website Hosting (1 year)</span>
+                  <span>{t('wizard.websiteHosting')}</span>
                   <span>€19.99</span>
                 </div>
                 <div className="border-t pt-2 mt-2">
                   <div className="flex justify-between font-medium">
-                    <span>Total</span>
+                    <span>{t('wizard.total')}</span>
                     <span>€49.98</span>
                   </div>
                 </div>
@@ -375,7 +376,7 @@ export const PropertyWizard: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Payment Method</h4>
+              <h4 className="font-medium text-gray-900">{t('wizard.paymentMethod')}</h4>
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { id: 'ideal', label: 'iDEAL', icon: '🏦' },
@@ -453,9 +454,9 @@ export const PropertyWizard: React.FC = () => {
               <h3 className={`text-sm font-medium ${
                 index === currentStep ? 'text-blue-600' : 'text-gray-900'
               }`}>
-                {step.title}
+                {t(step.titleKey)}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">{step.description}</p>
+              <p className="text-xs text-gray-500 mt-1">{t(step.descriptionKey)}</p>
             </div>
           ))}
         </div>
@@ -464,7 +465,7 @@ export const PropertyWizard: React.FC = () => {
       {/* Step Content */}
       <div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-6">
-          {steps[currentStep].title}
+          {t(steps[currentStep].titleKey)}
         </h2>
         {renderStepContent()}
       </div>
@@ -477,7 +478,7 @@ export const PropertyWizard: React.FC = () => {
           className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Previous
+          {t('common.previous')}
         </button>
 
         {currentStep === steps.length - 1 ? (
@@ -489,11 +490,11 @@ export const PropertyWizard: React.FC = () => {
             {isSubmitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                Processing...
+                {t('wizard.processing')}
               </>
             ) : (
               <>
-                Complete Payment
+                {t('wizard.completePaymentBtn')}
                 <CreditCard className="h-4 w-4 ml-1" />
               </>
             )}
@@ -503,7 +504,7 @@ export const PropertyWizard: React.FC = () => {
             onClick={handleNext}
             className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
           >
-            Next
+            {t('common.next')}
             <ChevronRight className="h-4 w-4 ml-1" />
           </button>
         )}

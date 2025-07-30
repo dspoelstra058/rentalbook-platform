@@ -117,6 +117,7 @@ export default {
   'wizard.localInfoDesc': 'Nearby services and attractions',
   'wizard.chooseTemplate': 'Choose Template',
   'wizard.chooseTemplateDesc': 'Select design for your information book',
+  'wizard.chooseTemplateText': 'Choose a template for your information book:',
   'wizard.paymentPublish': 'Payment & Publish',
   'wizard.paymentPublishDesc': 'Complete payment to publish',
   'wizard.propertyName': 'Property Name',

@@ -209,6 +209,15 @@ export default {
 
   // Property Edit Page
   'wizard.updatePropertyInfo': 'Mettez à jour les informations de votre propriété',
+  'wizard.frontImage': 'Image de Face',
+  'wizard.backImage': 'Image de Dos',
+  'wizard.generalImages': 'Images Générales (8 images)',
+  'wizard.generalView': 'Vue générale',
+  'wizard.uploadFrontImage': 'Télécharger Image de Face',
+  'wizard.uploadBackImage': 'Télécharger Image de Dos',
+  'wizard.facilitiesSelected': 'équipements sélectionnés',
+  'common.selected': 'sélectionné',
+  'common.upload': 'Télécharger',
 
   // Admin Panel
   'admin.dashboard': 'Tableau de Bord Admin',

@@ -209,6 +209,15 @@ export default {
 
   // Property Edit Page
   'wizard.updatePropertyInfo': '更新您的房产信息',
+  'wizard.frontImage': '正面图片',
+  'wizard.backImage': '背面图片',
+  'wizard.generalImages': '常规图片（8张图片）',
+  'wizard.generalView': '常规视图',
+  'wizard.uploadFrontImage': '上传正面图片',
+  'wizard.uploadBackImage': '上传背面图片',
+  'wizard.facilitiesSelected': '已选择设施',
+  'common.selected': '已选择',
+  'common.upload': '上传',
 
   // Admin Panel
   'admin.dashboard': '管理员仪表板',

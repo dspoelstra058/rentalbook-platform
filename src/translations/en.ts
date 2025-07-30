@@ -31,6 +31,8 @@ export default {
   'common.draft': 'Draft',
   'common.active': 'Active',
   'common.inactive': 'Inactive',
+  'common.selected': 'selected',
+  'common.upload': 'Upload',
 
   // Navigation
   'nav.dashboard': 'Dashboard',
@@ -213,7 +215,6 @@ export default {
 
   // Property Edit Page
   'wizard.updatePropertyInfo': 'Update your property information',
-  'wizard.updatePropertyInfo': 'Update your property information',
   'wizard.frontImage': 'Front Image',
   'wizard.backImage': 'Back Image',
   'wizard.generalImages': 'General Images (8 images)',
@@ -221,8 +222,6 @@ export default {
   'wizard.uploadFrontImage': 'Upload Front Image',
   'wizard.uploadBackImage': 'Upload Back Image',
   'wizard.facilitiesSelected': 'facilities selected',
-  'common.selected': 'selected',
-  'common.upload': 'Upload',
 
   // Admin Panel
   'admin.dashboard': 'Admin Dashboard',

@@ -209,6 +209,15 @@ export default {
 
   // Property Edit Page
   'wizard.updatePropertyInfo': 'Aktualisieren Sie Ihre Immobilieninformationen',
+  'wizard.frontImage': 'Frontansicht',
+  'wizard.backImage': 'Rückansicht',
+  'wizard.generalImages': 'Allgemeine Bilder (8 Bilder)',
+  'wizard.generalView': 'Allgemeine Ansicht',
+  'wizard.uploadFrontImage': 'Frontansicht Hochladen',
+  'wizard.uploadBackImage': 'Rückansicht Hochladen',
+  'wizard.facilitiesSelected': 'Ausstattungen ausgewählt',
+  'common.selected': 'ausgewählt',
+  'common.upload': 'Hochladen',
 
   // Admin Panel
   'admin.dashboard': 'Admin Dashboard',

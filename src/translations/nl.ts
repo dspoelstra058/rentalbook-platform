@@ -209,6 +209,15 @@ export default {
 
   // Property Edit Page
   'wizard.updatePropertyInfo': 'Werk uw accommodatie-informatie bij',
+  'wizard.frontImage': 'Vooraanzicht',
+  'wizard.backImage': 'Achteraanzicht',
+  'wizard.generalImages': 'Algemene Afbeeldingen (8 afbeeldingen)',
+  'wizard.generalView': 'Algemeen zicht',
+  'wizard.uploadFrontImage': 'Vooraanzicht Uploaden',
+  'wizard.uploadBackImage': 'Achteraanzicht Uploaden',
+  'wizard.facilitiesSelected': 'faciliteiten geselecteerd',
+  'common.selected': 'geselecteerd',
+  'common.upload': 'Uploaden',
 
   // Admin Panel
   'admin.dashboard': 'Beheerderspaneel',

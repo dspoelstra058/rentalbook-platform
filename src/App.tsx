@@ -7,6 +7,8 @@ import { AuthForm } from './components/AuthPages';
 import { Dashboard } from './components/Dashboard';
 import { PropertyWizard } from './components/PropertyWizard';
 import { AdminPanel } from './components/AdminPanel';
+import { PropertiesPage } from './components/PropertiesPage';
+import { SettingsPage } from './components/SettingsPage';
 import { Layout } from './components/Layout';
 import { authService } from './utils/auth';
 
@@ -69,10 +71,7 @@ const AppContent: React.FC = () => {
         <Route path="/properties" element={
           <ProtectedRoute>
             <Layout>
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">Properties</h2>
-                <p className="text-gray-600 mt-2">Property management coming soon...</p>
-              </div>
+              <PropertiesPage />
             </Layout>
           </ProtectedRoute>
         } />
@@ -80,10 +79,7 @@ const AppContent: React.FC = () => {
         <Route path="/settings" element={
           <ProtectedRoute>
             <Layout>
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-                <p className="text-gray-600 mt-2">Account settings coming soon...</p>
-              </div>
+              <SettingsPage />
             </Layout>
           </ProtectedRoute>
         } />

@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Check, MapPin, Home, FileText, Palette, Cred
 import { useLanguage } from '../contexts/LanguageContext';
 import { Property, LocalInfo, Template } from '../types';
 import { templates } from '../utils/data';
-import { facilityCategories } from '../utils/facilities';
+import { getFacilityCategories } from '../utils/facilities';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
 import { useParams } from 'react-router-dom';
@@ -544,7 +544,7 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
             </div>
             
             <div className="space-y-6 max-h-[500px] overflow-y-auto">
-              {facilityCategories.map((category) => (
+              {getFacilityCategories(t).map((category) => (
                 <div key={category.id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
                     <div className="flex items-center justify-between">

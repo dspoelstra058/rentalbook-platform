@@ -1,3 +1,5 @@
+import { useLanguage } from '../contexts/LanguageContext';
+
 export interface FacilityCategory {
   id: string;
   name: string;
@@ -9,168 +11,168 @@ export interface Facility {
   name: string;
 }
 
-export const facilityCategories: FacilityCategory[] = [
+export const getFacilityCategories = (t: (key: string) => string): FacilityCategory[] => [
   {
     id: 'heating-cooling',
-    name: 'Heating / Cooling',
+    name: t('facilities.heatingCooling'),
     facilities: [
-      { id: 'air-conditioning', name: 'Air conditioning' },
-      { id: 'central-heating', name: 'Central heating' },
-      { id: 'boiler', name: 'Boiler' },
-      { id: 'wood-burning-stove', name: 'Wood-burning stove' },
-      { id: 'underfloor-heating', name: 'Underfloor heating' },
-      { id: 'fan', name: 'Fan' }
+      { id: 'air-conditioning', name: t('facility.airConditioning') },
+      { id: 'central-heating', name: t('facility.centralHeating') },
+      { id: 'boiler', name: t('facility.boiler') },
+      { id: 'wood-burning-stove', name: t('facility.woodBurningStove') },
+      { id: 'underfloor-heating', name: t('facility.underfloorHeating') },
+      { id: 'fan', name: t('facility.fan') }
     ]
   },
   {
     id: 'linen',
-    name: 'Linen',
+    name: t('facilities.linen'),
     facilities: [
-      { id: 'bed-linen', name: 'Bed linen' },
-      { id: 'towels', name: 'Towels' },
-      { id: 'kitchen-linen', name: 'Kitchen linen' },
-      { id: 'linen-baby-cot', name: 'Linen for baby cot' },
-      { id: 'beach-towels', name: 'Beach towels' }
+      { id: 'bed-linen', name: t('facility.bedLinen') },
+      { id: 'towels', name: t('facility.towels') },
+      { id: 'kitchen-linen', name: t('facility.kitchenLinen') },
+      { id: 'linen-baby-cot', name: t('facility.linenBabyCot') },
+      { id: 'beach-towels', name: t('facility.beachTowels') }
     ]
   },
   {
     id: 'internet-media-audio',
-    name: 'Internet, Media & Audio',
+    name: t('facilities.internetMediaAudio'),
     facilities: [
-      { id: 'wifi', name: 'Wi-Fi' },
-      { id: 'wired-internet', name: 'Wired internet connection' },
-      { id: 'usb-port', name: 'USB port' },
-      { id: 'television', name: 'Television' },
-      { id: 'cable-tv', name: 'Cable TV' },
-      { id: 'smart-tv', name: 'Smart TV' },
-      { id: 'streaming-services', name: 'Streaming services (Netflix / Disney+)' },
-      { id: 'radio', name: 'Radio' },
-      { id: 'bluetooth-speaker', name: 'Bluetooth speaker' }
+      { id: 'wifi', name: t('facility.wifi') },
+      { id: 'wired-internet', name: t('facility.wiredInternet') },
+      { id: 'usb-port', name: t('facility.usbPort') },
+      { id: 'television', name: t('facility.television') },
+      { id: 'cable-tv', name: t('facility.cableTV') },
+      { id: 'smart-tv', name: t('facility.smartTV') },
+      { id: 'streaming-services', name: t('facility.streamingServices') },
+      { id: 'radio', name: t('facility.radio') },
+      { id: 'bluetooth-speaker', name: t('facility.bluetoothSpeaker') }
     ]
   },
   {
     id: 'kitchen-cooking',
-    name: 'Kitchen / Cooking',
+    name: t('facilities.kitchenCooking'),
     facilities: [
-      { id: 'refrigerator', name: 'Refrigerator (with freezer)' },
-      { id: 'oven-microwave', name: 'Oven / combination microwave' },
-      { id: 'microwave', name: 'Microwave' },
-      { id: 'electric-kettle', name: 'Electric kettle' },
-      { id: 'dishwasher', name: 'Dishwasher' },
-      { id: 'fully-equipped-kitchen', name: 'Fully equipped kitchen' },
-      { id: 'high-chair', name: 'High chair' },
-      { id: 'coffee-maker', name: 'Coffee maker' }
+      { id: 'refrigerator', name: t('facility.refrigerator') },
+      { id: 'oven-microwave', name: t('facility.ovenMicrowave') },
+      { id: 'microwave', name: t('facility.microwave') },
+      { id: 'electric-kettle', name: t('facility.electricKettle') },
+      { id: 'dishwasher', name: t('facility.dishwasher') },
+      { id: 'fully-equipped-kitchen', name: t('facility.fullyEquippedKitchen') },
+      { id: 'high-chair', name: t('facility.highChair') },
+      { id: 'coffee-maker', name: t('facility.coffeeMaker') }
     ]
   },
   {
     id: 'sanitary-facilities',
-    name: 'Sanitary Facilities',
+    name: t('facilities.sanitaryFacilities'),
     facilities: [
-      { id: 'bathtub', name: 'Bathtub' },
-      { id: 'washing-machine', name: 'Washing machine' },
-      { id: 'dryer', name: 'Dryer' },
-      { id: 'hairdryer', name: 'Hairdryer' },
-      { id: 'toilets', name: 'Toilets' },
-      { id: 'shower', name: 'Shower' }
+      { id: 'bathtub', name: t('facility.bathtub') },
+      { id: 'washing-machine', name: t('facility.washingMachine') },
+      { id: 'dryer', name: t('facility.dryer') },
+      { id: 'hairdryer', name: t('facility.hairdryer') },
+      { id: 'toilets', name: t('facility.toilets') },
+      { id: 'shower', name: t('facility.shower') }
     ]
   },
   {
     id: 'child-friendly',
-    name: 'Child-Friendly Amenities',
+    name: t('facilities.childFriendly'),
     facilities: [
-      { id: 'baby-cot', name: 'Baby cot / travel cot' },
-      { id: 'stair-gate', name: 'Stair gate' },
-      { id: 'toys', name: 'Toys' },
-      { id: 'outdoor-play-equipment', name: 'Outdoor play equipment' }
+      { id: 'baby-cot', name: t('facility.babyCot') },
+      { id: 'stair-gate', name: t('facility.stairGate') },
+      { id: 'toys', name: t('facility.toys') },
+      { id: 'outdoor-play-equipment', name: t('facility.outdoorPlayEquipment') }
     ]
   },
   {
     id: 'outdoor-facilities',
-    name: 'Outdoor Facilities',
+    name: t('facilities.outdoorFacilities'),
     facilities: [
-      { id: 'garden', name: 'Garden' },
-      { id: 'shared-garden', name: 'Shared garden' },
-      { id: 'fully-fenced-garden', name: 'Fully fenced garden' },
-      { id: 'terrace', name: 'Terrace' },
-      { id: 'veranda', name: 'Veranda' },
-      { id: 'lounge-set', name: 'Lounge set' },
-      { id: 'barbecue', name: 'Barbecue' },
-      { id: 'outdoor-lighting', name: 'Outdoor lighting' },
-      { id: 'private-driveway', name: 'Private driveway' },
-      { id: 'garden-chairs', name: 'Garden chairs' },
-      { id: 'garden-tables', name: 'Garden tables' },
-      { id: 'sun-loungers', name: 'Sun loungers' },
-      { id: 'parking-spaces', name: 'Parking spaces' }
+      { id: 'garden', name: t('facility.garden') },
+      { id: 'shared-garden', name: t('facility.sharedGarden') },
+      { id: 'fully-fenced-garden', name: t('facility.fullyFencedGarden') },
+      { id: 'terrace', name: t('facility.terrace') },
+      { id: 'veranda', name: t('facility.veranda') },
+      { id: 'lounge-set', name: t('facility.loungeSet') },
+      { id: 'barbecue', name: t('facility.barbecue') },
+      { id: 'outdoor-lighting', name: t('facility.outdoorLighting') },
+      { id: 'private-driveway', name: t('facility.privateDriveway') },
+      { id: 'garden-chairs', name: t('facility.gardenChairs') },
+      { id: 'garden-tables', name: t('facility.gardenTables') },
+      { id: 'sun-loungers', name: t('facility.sunLoungers') },
+      { id: 'parking-spaces', name: t('facility.parkingSpaces') }
     ]
   },
   {
     id: 'accessibility',
-    name: 'Accessibility',
+    name: t('facilities.accessibility'),
     facilities: [
-      { id: 'ground-floor', name: 'Ground floor' },
-      { id: 'wheelchair-entrance', name: 'Wheelchair-accessible entrance' },
-      { id: 'wheelchair-bathroom', name: 'Wheelchair-accessible bathroom' },
-      { id: 'extra-wide-doors', name: 'Extra-wide doors' }
+      { id: 'ground-floor', name: t('facility.groundFloor') },
+      { id: 'wheelchair-entrance', name: t('facility.wheelchairEntrance') },
+      { id: 'wheelchair-bathroom', name: t('facility.wheelchairBathroom') },
+      { id: 'extra-wide-doors', name: t('facility.extraWideDoors') }
     ]
   },
   {
     id: 'wellness',
-    name: 'Wellness',
+    name: t('facilities.wellness'),
     facilities: [
-      { id: 'sauna', name: 'Sauna' },
-      { id: 'hot-tub', name: 'Hot tub / jacuzzi' },
-      { id: 'indoor-pool', name: 'Indoor pool' },
-      { id: 'outdoor-pool', name: 'Outdoor pool' },
-      { id: 'massage-shower', name: 'Massage shower' }
+      { id: 'sauna', name: t('facility.sauna') },
+      { id: 'hot-tub', name: t('facility.hotTub') },
+      { id: 'indoor-pool', name: t('facility.indoorPool') },
+      { id: 'outdoor-pool', name: t('facility.outdoorPool') },
+      { id: 'massage-shower', name: t('facility.massageShower') }
     ]
   },
   {
     id: 'beach-leisure',
-    name: 'Beach / Leisure',
+    name: t('facilities.beachLeisure'),
     facilities: [
-      { id: 'parasol', name: 'Parasol' },
-      { id: 'cooler-box', name: 'Cooler box' },
-      { id: 'beach-toys', name: 'Beach toys' },
-      { id: 'beach-chairs', name: 'Beach chairs' },
-      { id: 'bicycles', name: 'Bicycles' }
+      { id: 'parasol', name: t('facility.parasol') },
+      { id: 'cooler-box', name: t('facility.coolerBox') },
+      { id: 'beach-toys', name: t('facility.beachToys') },
+      { id: 'beach-chairs', name: t('facility.beachChairs') },
+      { id: 'bicycles', name: t('facility.bicycles') }
     ]
   },
   {
     id: 'safety',
-    name: 'Safety',
+    name: t('facilities.safety'),
     facilities: [
-      { id: 'smoke-detector', name: 'Smoke detector' },
-      { id: 'carbon-monoxide-detector', name: 'Carbon monoxide detector' },
-      { id: 'fire-extinguisher', name: 'Fire extinguisher' },
-      { id: 'first-aid-kit', name: 'First aid kit' },
-      { id: 'safe', name: 'Safe' }
+      { id: 'smoke-detector', name: t('facility.smokeDetector') },
+      { id: 'carbon-monoxide-detector', name: t('facility.carbonMonoxideDetector') },
+      { id: 'fire-extinguisher', name: t('facility.fireExtinguisher') },
+      { id: 'first-aid-kit', name: t('facility.firstAidKit') },
+      { id: 'safe', name: t('facility.safe') }
     ]
   },
   {
     id: 'pets',
-    name: 'Pets',
+    name: t('facilities.pets'),
     facilities: [
-      { id: 'pets-allowed', name: 'Pets allowed' },
-      { id: 'dog-bed-bowl', name: 'Dog bed / food bowl provided' },
-      { id: 'fenced-garden-pets', name: 'Fenced garden suitable for pets' }
+      { id: 'pets-allowed', name: t('facility.petsAllowed') },
+      { id: 'dog-bed-bowl', name: t('facility.dogBedBowl') },
+      { id: 'fenced-garden-pets', name: t('facility.fencedGardenPets') }
     ]
   },
   {
     id: 'privacy',
-    name: 'Privacy',
+    name: t('facilities.privacy'),
     facilities: [
-      { id: 'detached-house', name: 'Detached house' },
-      { id: 'terraced-house', name: 'Terraced house' },
-      { id: 'onsite-manager', name: 'On-site manager' }
+      { id: 'detached-house', name: t('facility.detachedHouse') },
+      { id: 'terraced-house', name: t('facility.terracedHouse') },
+      { id: 'onsite-manager', name: t('facility.onsiteManager') }
     ]
   },
   {
     id: 'games-entertainment',
-    name: 'Games & Entertainment',
+    name: t('facilities.gamesEntertainment'),
     facilities: [
-      { id: 'board-games', name: '(Board) games' },
-      { id: 'game-console', name: 'Game console' },
-      { id: 'books-magazines', name: 'Books / magazines' }
+      { id: 'board-games', name: t('facility.boardGames') },
+      { id: 'game-console', name: t('facility.gameConsole') },
+      { id: 'books-magazines', name: t('facility.booksMagazines') }
     ]
   }
 ];

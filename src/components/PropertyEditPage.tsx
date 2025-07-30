@@ -4,7 +4,7 @@ import { Save, ArrowLeft, Palette, Home, Settings, Image, Upload, X } from 'luci
 import { useLanguage } from '../contexts/LanguageContext';
 import { Property, LocalInfo } from '../types';
 import { templates } from '../utils/data';
-import { facilityCategories } from '../utils/facilities';
+import { getFacilityCategories } from '../utils/facilities';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
 
@@ -411,7 +411,7 @@ export const PropertyEditPage: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('wizard.facilities')}</h3>
             <div className="space-y-6 max-h-96 overflow-y-auto">
-              {facilityCategories.map((category) => (
+              {getFacilityCategories(t).map((category) => (
                 <div key={category.id} className="border border-gray-200 rounded-lg overflow-hidden">
                   <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
                     <h4 className="font-medium text-gray-900 flex items-center">

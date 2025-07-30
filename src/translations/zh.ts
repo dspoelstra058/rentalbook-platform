@@ -20,6 +20,8 @@ export default {
   'common.address': '地址',
   'common.city': '城市',
   'common.country': '国家',
+  'common.zipCode': '邮政编码',
+  'common.postalCode': '邮政编码',
   'common.phone': '电话',
   'common.website': '网站',
   'common.description': '描述',

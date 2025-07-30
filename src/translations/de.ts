@@ -20,6 +20,8 @@ export default {
   'common.address': 'Adresse',
   'common.city': 'Stadt',
   'common.country': 'Land',
+  'common.zipCode': 'Postleitzahl',
+  'common.postalCode': 'Postleitzahl',
   'common.phone': 'Telefon',
   'common.website': 'Website',
   'common.description': 'Beschreibung',

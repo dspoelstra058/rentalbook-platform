@@ -205,7 +205,10 @@ export const Dashboard: React.FC = () => {
                     )}
                   </div>
                   <p className="text-sm text-gray-600 mt-1">
-                    {property.address}, {property.city}, {property.country}
+                    {property.address}
+                    {property.zipCode && `, ${property.zipCode}`}
+                    {property.city && `, ${property.city}`}
+                    {property.country && `, ${property.country}`}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     Created {property.createdAt.toLocaleDateString()}

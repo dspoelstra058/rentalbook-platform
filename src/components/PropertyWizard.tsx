@@ -108,7 +108,7 @@ export const PropertyWizard: React.FC = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Address
+                {t('common.address')}
               </label>
               <input
                 type="text"
@@ -116,6 +116,18 @@ export const PropertyWizard: React.FC = () => {
                 onChange={(e) => updateFormData({ address: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., 123 Ocean View Drive"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('common.zipCode')}
+              </label>
+              <input
+                type="text"
+                value={formData.zipCode}
+                onChange={(e) => updateFormData({ zipCode: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 90401"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

@@ -11,6 +11,7 @@ export interface Property {
   ownerId: string;
   name: string;
   address: string;
+  zipCode?: string;
   city: string;
   country: string;
   description: string;
@@ -30,6 +31,7 @@ export interface LocalInfo {
   name: string;
   category: 'doctor' | 'pharmacy' | 'supermarket' | 'restaurant' | 'hospital' | 'attraction' | 'beach' | 'activity';
   address: string;
+  zipCode?: string;
   phone?: string;
   website?: string;
   description: string;

@@ -1108,7 +1108,10 @@ export const AdminPanel: React.FC = () => {
                   </div>
                   <p className="text-sm text-gray-600 mt-1">{info.description}</p>
                   <div className="text-xs text-gray-500 mt-2">
-                    📍 {info.address}, {info.city}, {info.country}
+                    📍 {info.address}
+                    {info.zip_code && `, ${info.zip_code}`}
+                    {info.city && `, ${info.city}`}
+                    {info.country && `, ${info.country}`}
                     {info.phone && <span> • 📞 {info.phone}</span>}
                     {info.opening_hours && <span> • 🕒 {info.opening_hours}</span>}
                   </div>

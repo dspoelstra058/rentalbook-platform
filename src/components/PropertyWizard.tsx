@@ -127,8 +127,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
     setIsLoadingProperty(true);
     try {
       const { data, error } = await supabase
-          facilities: formData.facilities || [],
-          facilities: formData.facilities || [],
         .from('properties')
         .select('*')
         .eq('id', propertyId)

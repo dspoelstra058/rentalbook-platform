@@ -106,9 +106,7 @@ serve(async (req) => {
         id: newUser.user.id,
         email,
         name,
-        role,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        role
       })
 
     if (profileInsertError) {

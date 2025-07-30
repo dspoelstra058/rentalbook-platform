@@ -109,6 +109,7 @@ export const AdminPanel: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [userFormError, setUserFormError] = useState<string | null>(null);
+    console.log('Editing local info:', info);
   const [localInfoFormError, setLocalInfoFormError] = useState<string | null>(null);
   const [propertyFormError, setPropertyFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);

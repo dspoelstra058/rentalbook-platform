@@ -113,9 +113,52 @@ export const PropertyWizard: React.FC = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    navigate('/dashboard');
+    
+    try {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Create the property in Supabase
+      const { data, error } = await supabase
+        .from('properties')
+        .insert({
+          owner_id: user.id,
+          name: formData.name || '',
+          address: formData.address || '',
+          zip_code: formData.zipCode || null,
+          city: formData.city || '',
+          country: formData.country || '',
+          description: formData.description || '',
+          checkin_instructions: formData.checkInInstructions || '',
+          wifi_password: formData.wifiPassword || '',
+          house_rules: formData.houseRules || '',
+          emergency_contacts: formData.emergencyContacts || '',
+          template_id: formData.templateId || 'modern-blue',
+          is_published: true, // Assuming published after payment
+          website_url: null // Will be generated later
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating property:', error);
+        throw new Error(error.message);
+      }
+
+      console.log('Property created successfully:', data);
+      
+      // TODO: Save selected local info associations if needed
+      // This would require a junction table between properties and local_info
+      
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Failed to create property:', error);
+      alert('Failed to create property. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const updateFormData = (updates: Partial<Property>) => {

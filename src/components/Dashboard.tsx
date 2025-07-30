@@ -25,6 +25,16 @@ export const Dashboard: React.FC = () => {
     loadProperties();
   }, []);
 
+  // Also reload when component becomes visible (e.g., after navigation)
+  useEffect(() => {
+    const handleFocus = () => {
+      loadProperties();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
   const loadProperties = async () => {
     setLoading(true);
     setError(null);
@@ -35,11 +45,15 @@ export const Dashboard: React.FC = () => {
         throw new Error('User not authenticated');
       }
 
+      console.log('Loading properties for user:', user.id);
+
       const { data: propertiesData, error: propertiesError } = await supabase
         .from('properties')
         .select('*')
         .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
+
+      console.log('Properties query result:', { data: propertiesData, error: propertiesError });
 
       if (propertiesError) throw propertiesError;
       
@@ -64,6 +78,7 @@ export const Dashboard: React.FC = () => {
       }));
 
       setProperties(transformedProperties);
+      console.log('Transformed properties:', transformedProperties);
     } catch (err) {
       console.error('Error loading properties:', err);
       setError(err instanceof Error ? err.message : 'Failed to load properties');

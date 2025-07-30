@@ -145,9 +145,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean 
 function App() {
   return (
     <LanguageProvider>
-      <Router>
-        <Routes>
-          {/* Public Routes */}
       <AppContent />
     </LanguageProvider>
   );

@@ -206,13 +206,20 @@ export const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
             </button>
           </div>
 
-          {type === 'login' && (
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                {t('auth.demoCredentials')}
-              </p>
+        {type === 'login' && (
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <h3 className="text-sm font-medium text-blue-800 mb-2">
+              {t('auth.demoCredentials')}
+            </h3>
+            <div className="text-xs text-blue-700 space-y-1">
+              <p><strong>Admin:</strong> admin@example.com / admin123</p>
+              <p><strong>Owner:</strong> owner@example.com / owner123</p>
             </div>
-          )}
+            <p className="text-xs text-blue-600 mt-2">
+              Or create a new account using the registration form.
+            </p>
+          </div>
+        )}
         </form>
       </div>
     </div>

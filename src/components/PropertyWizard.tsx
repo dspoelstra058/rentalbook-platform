@@ -412,8 +412,8 @@ export const PropertyWizard: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Create New Property</h1>
-        <p className="text-gray-600">Follow the steps to create your vacation rental information book.</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('wizard.createNewProperty')}</h1>
+        <p className="text-gray-600">{t('wizard.followSteps')}</p>
       </div>
 
       {/* Progress Steps */}

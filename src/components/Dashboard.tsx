@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Eye, Edit, Trash2, ExternalLink, Download, BarChart3, Palette } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Property } from '../types';
 import { templates } from '../utils/data';
 import { PDFGenerator } from '../utils/pdfGenerator';
@@ -11,6 +12,7 @@ import { authService } from '../utils/auth';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,10 +73,10 @@ export const Dashboard: React.FC = () => {
   };
 
   const stats = [
-    { label: 'Total Properties', value: properties.length.toString(), icon: BarChart3, color: 'blue' },
-    { label: 'Published', value: properties.filter(p => p.isPublished).length.toString(), icon: Eye, color: 'green' },
-    { label: 'Views This Month', value: '1,247', icon: ExternalLink, color: 'purple' },
-    { label: 'PDF Downloads', value: '89', icon: Download, color: 'orange' }
+    { label: t('dashboard.totalProperties'), value: properties.length.toString(), icon: BarChart3, color: 'blue' },
+    { label: t('dashboard.published'), value: properties.filter(p => p.isPublished).length.toString(), icon: Eye, color: 'green' },
+    { label: t('dashboard.viewsThisMonth'), value: '1,247', icon: ExternalLink, color: 'purple' },
+    { label: t('dashboard.pdfDownloads'), value: '89', icon: Download, color: 'orange' }
   ];
 
   const handleDownloadPDF = async (propertyId: string) => {
@@ -134,15 +136,15 @@ export const Dashboard: React.FC = () => {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Manage your vacation rental information books</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+          <p className="text-gray-600">{t('dashboard.subtitle')}</p>
         </div>
         <button
           onClick={() => navigate('/properties/new')}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Add Property
+          {t('dashboard.addProperty')}
         </button>
       </div>
 
@@ -169,21 +171,21 @@ export const Dashboard: React.FC = () => {
       {/* Properties List */}
       <div className="bg-white rounded-lg shadow-sm border">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Your Properties</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('dashboard.yourProperties')}</h2>
         </div>
         {properties.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-gray-400 mb-4">
               <BarChart3 className="h-12 w-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No properties yet</h3>
-            <p className="text-gray-600 mb-6">Get started by creating your first vacation rental information book.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('dashboard.noProperties')}</h3>
+            <p className="text-gray-600 mb-6">{t('dashboard.getStartedMessage')}</p>
             <button
               onClick={() => navigate('/properties/new')}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Create Your First Property
+              {t('dashboard.createFirstProperty')}
             </button>
           </div>
         ) : (
@@ -196,11 +198,11 @@ export const Dashboard: React.FC = () => {
                     <h3 className="text-lg font-medium text-gray-900">{property.name}</h3>
                     {property.isPublished ? (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Published
+                        {t('common.published')}
                       </span>
                     ) : (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        Draft
+                        {t('common.draft')}
                       </span>
                     )}
                   </div>
@@ -211,7 +213,7 @@ export const Dashboard: React.FC = () => {
                     {property.country && `, ${property.country}`}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Created {property.createdAt.toLocaleDateString()}
+                    {t('dashboard.created')} {property.createdAt.toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -221,7 +223,7 @@ export const Dashboard: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                      title="View Website"
+                     title={t('dashboard.viewWebsite')}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </a>
@@ -230,7 +232,7 @@ export const Dashboard: React.FC = () => {
                     onClick={() => handleDownloadPDF(property.id)}
                     disabled={isGeneratingPDF}
                     className="p-2 text-gray-400 hover:text-green-600 transition-colors"
-                    title="Download PDF"
+                    title={t('dashboard.downloadPdf')}
                   >
                     {isGeneratingPDF ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-600 border-t-transparent" />
@@ -241,20 +243,20 @@ export const Dashboard: React.FC = () => {
                   <button
                     onClick={() => handleChangeTemplate(property.id)}
                     className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
-                    title="Change Template"
+                    title={t('dashboard.changeTemplate')}
                   >
                     <Palette className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => navigate(`/properties/${property.id}/edit`)}
                     className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                    title="Edit Property"
+                    title={t('dashboard.editProperty')}
                   >
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
                     className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                    title="Delete Property"
+                    title={t('dashboard.deleteProperty')}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -273,7 +275,7 @@ export const Dashboard: React.FC = () => {
             <div className="p-6 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Choose Template
+                  {t('dashboard.chooseTemplate')}
                 </h3>
                 <button
                   onClick={() => setShowTemplateModal(false)}

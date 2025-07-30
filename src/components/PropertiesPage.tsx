@@ -6,6 +6,7 @@ import { Property } from '../types';
 import { templates } from '../utils/data';
 import { PDFGenerator } from '../utils/pdfGenerator';
 import { TemplatePreview } from './TemplatePreview';
+import { ConfirmationModal } from './ConfirmationModal';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
 
@@ -20,6 +21,8 @@ export const PropertiesPage: React.FC = () => {
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [deletingPropertyId, setDeletingPropertyId] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [propertyToDelete, setPropertyToDelete] = useState<Property | null>(null);
 
   useEffect(() => {
     loadProperties();
@@ -119,16 +122,22 @@ export const PropertiesPage: React.FC = () => {
   };
 
   const handleDeleteProperty = async (propertyId: string) => {
-    if (!confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
-      return;
-    }
+    const property = properties.find(p => p.id === propertyId);
+    if (!property) return;
+    
+    setPropertyToDelete(property);
+    setShowDeleteModal(true);
+  };
 
-    setDeletingPropertyId(propertyId);
+  const confirmDeleteProperty = async () => {
+    if (!propertyToDelete) return;
+
+    setDeletingPropertyId(propertyToDelete.id);
     try {
       const { error } = await supabase
         .from('properties')
         .delete()
-        .eq('id', propertyId);
+        .eq('id', propertyToDelete.id);
 
       if (error) {
         console.error('Error deleting property:', error);
@@ -137,8 +146,10 @@ export const PropertiesPage: React.FC = () => {
       }
 
       // Remove the property from the local state
-      setProperties(prev => prev.filter(p => p.id !== propertyId));
+      setProperties(prev => prev.filter(p => p.id !== propertyToDelete.id));
       console.log('Property deleted successfully');
+      setShowDeleteModal(false);
+      setPropertyToDelete(null);
     } catch (error) {
       console.error('Failed to delete property:', error);
       alert('Failed to delete property. Please try again.');
@@ -331,6 +342,22 @@ export const PropertiesPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setPropertyToDelete(null);
+        }}
+        onConfirm={confirmDeleteProperty}
+        title="Delete Property"
+        message={`Are you sure you want to delete "${propertyToDelete?.name}"? This action cannot be undone and will permanently remove all property data.`}
+        confirmText="Delete Property"
+        cancelText="Cancel"
+        isLoading={deletingPropertyId === propertyToDelete?.id}
+        type="danger"
+      />
     </div>
   );
 };

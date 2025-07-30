@@ -274,6 +274,60 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
+  const handleImageUpload = (type: 'front' | 'back' | 'general', index?: number) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const imageUrl = e.target?.result as string;
+          const currentImages = formData.images || { front: '', general: [], back: '' };
+          
+          if (type === 'front') {
+            updateFormData({
+              images: { ...currentImages, front: imageUrl }
+            });
+          } else if (type === 'back') {
+            updateFormData({
+              images: { ...currentImages, back: imageUrl }
+            });
+          } else if (type === 'general' && typeof index === 'number') {
+            const newGeneral = [...(currentImages.general || [])];
+            newGeneral[index] = imageUrl;
+            updateFormData({
+              images: { ...currentImages, general: newGeneral }
+            });
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
+
+  const removeImage = (type: 'front' | 'back' | 'general', index?: number) => {
+    const currentImages = formData.images || { front: '', general: [], back: '' };
+    
+    if (type === 'front') {
+      updateFormData({
+        images: { ...currentImages, front: '' }
+      });
+    } else if (type === 'back') {
+      updateFormData({
+        images: { ...currentImages, back: '' }
+      });
+    } else if (type === 'general' && typeof index === 'number') {
+      const newGeneral = [...(currentImages.general || [])];
+      newGeneral[index] = '';
+      updateFormData({
+        images: { ...currentImages, general: newGeneral }
+      });
+    }
+  };
+
   // Load local info when city or country changes
   useEffect(() => {
     const loadLocalInfo = async () => {

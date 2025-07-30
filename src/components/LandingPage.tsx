@@ -65,26 +65,38 @@ export const LandingPage: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+      <section className="relative text-white py-20 overflow-hidden">
+        {/* Parallax Background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-fixed transform scale-110"
+          style={{
+            backgroundImage: 'url(/pexels-joachim-hoholm-371880152-29453302.jpg)',
+            willChange: 'transform'
+          }}
+        />
+        
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-800/70 to-blue-900/80" />
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+          <div className="relative z-10 text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               {t('landing.title')}
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto drop-shadow-lg">
               {t('landing.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => navigate('/register')}
-                className="flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 {t('landing.startFreeTrial')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </button>
               <button
                 onClick={() => navigate('/demo')}
-                className="flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-colors"
+                className="flex items-center justify-center px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 {t('landing.viewDemo')}
               </button>

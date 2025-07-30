@@ -253,8 +253,6 @@ export default {
   'admin.templateColumns': 'Naam,Categorie,Adres,Telefoon,Website,Beschrijving,Stad,Land,Beoordeling,Openingstijden,Geverifieerd',
 
   // User Management
-  'admin.editLocalInfo': 'Lokale Informatie Bewerken',
-  'admin.deleteLocalInfo': 'Lokale Informatie Verwijderen',
   'admin.addUser': 'Gebruiker Toevoegen',
   'admin.addUserForm': 'Nieuwe Gebruiker Toevoegen',
   'admin.fullName': 'Volledige Naam',
@@ -270,6 +268,10 @@ export default {
   'admin.failedToCreateUser': 'Kon gebruiker niet aanmaken',
   'admin.passwordsNotMatch': 'Wachtwoorden komen niet overeen',
   'admin.fillAllFields': 'Vul alle verplichte velden in',
+  'admin.editLocalInfoForm': 'Lokale Informatie Bewerken',
+  'admin.updating': 'Bijwerken...',
+  'admin.updateLocalInfo': 'Lokale Info Bijwerken',
+  'admin.failedToUpdate': 'Kon lokale informatie niet bijwerken',
 
   // Templates
   'templates.modernBlue': 'Modern Blauw',

@@ -253,8 +253,6 @@ export default {
   'admin.templateColumns': '名称,类别,地址,电话,网站,描述,城市,国家,评分,营业时间,已验证',
 
   // User Management
-  'admin.editLocalInfo': '编辑本地信息',
-  'admin.deleteLocalInfo': '删除本地信息',
   'admin.addUser': '添加用户',
   'admin.addUserForm': '添加新用户',
   'admin.fullName': '全名',
@@ -270,6 +268,10 @@ export default {
   'admin.failedToCreateUser': '创建用户失败',
   'admin.passwordsNotMatch': '密码不匹配',
   'admin.fillAllFields': '请填写所有必填字段',
+  'admin.editLocalInfoForm': '编辑本地信息',
+  'admin.updating': '更新中...',
+  'admin.updateLocalInfo': '更新本地信息',
+  'admin.failedToUpdate': '更新本地信息失败',
 
   // Templates
   'templates.modernBlue': '现代蓝色',

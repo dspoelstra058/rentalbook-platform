@@ -253,8 +253,6 @@ export default {
   'admin.templateColumns': 'Nombre,Categoría,Dirección,Teléfono,Sitio Web,Descripción,Ciudad,País,Calificación,Horarios de Apertura,Verificado',
 
   // User Management
-  'admin.editLocalInfo': 'Editar Información Local',
-  'admin.deleteLocalInfo': 'Eliminar Información Local',
   'admin.addUser': 'Agregar Usuario',
   'admin.addUserForm': 'Agregar Nuevo Usuario',
   'admin.fullName': 'Nombre Completo',
@@ -270,6 +268,10 @@ export default {
   'admin.failedToCreateUser': 'No se pudo crear el usuario',
   'admin.passwordsNotMatch': 'Las contraseñas no coinciden',
   'admin.fillAllFields': 'Por favor complete todos los campos requeridos',
+  'admin.editLocalInfoForm': 'Editar Información Local',
+  'admin.updating': 'Actualizando...',
+  'admin.updateLocalInfo': 'Actualizar Info Local',
+  'admin.failedToUpdate': 'No se pudo actualizar la información local',
 
   // Templates
   'templates.modernBlue': 'Azul Moderno',

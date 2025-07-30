@@ -124,7 +124,7 @@ export default {
   'wizard.zipCodePlaceholder': 'z.B., 12345',
   'wizard.addressPlaceholder': 'z.B., Meerblickstraße 123',
   'wizard.cityPlaceholder': 'z.B., München',
-  'wizard.countryPlaceholder': 'z.B., Deutschland',
+  'wizard.selectCountry': 'Land Auswählen',
   'wizard.propertyDescription': 'Immobilienbeschreibung',
   'wizard.describeProperty': 'Beschreiben Sie Ihre Immobilie...',
   'wizard.checkInInstructions': 'Check-in Anweisungen',

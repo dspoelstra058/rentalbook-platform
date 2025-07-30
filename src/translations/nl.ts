@@ -124,7 +124,7 @@ export default {
   'wizard.zipCodePlaceholder': 'bijv., 1234 AB',
   'wizard.addressPlaceholder': 'bijv., Zeezichtlaan 123',
   'wizard.cityPlaceholder': 'bijv., Amsterdam',
-  'wizard.countryPlaceholder': 'bijv., Nederland',
+  'wizard.selectCountry': 'Selecteer Land',
   'wizard.propertyDescription': 'Accommodatiebeschrijving',
   'wizard.describeProperty': 'Beschrijf je accommodatie...',
   'wizard.checkInInstructions': 'Incheckinstructies',

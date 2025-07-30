@@ -124,7 +124,7 @@ export default {
   'wizard.zipCodePlaceholder': 'ej., 28001',
   'wizard.addressPlaceholder': 'ej., Calle Vista al Mar 123',
   'wizard.cityPlaceholder': 'ej., Barcelona',
-  'wizard.countryPlaceholder': 'ej., España',
+  'wizard.selectCountry': 'Seleccionar País',
   'wizard.propertyDescription': 'Descripción de la Propiedad',
   'wizard.describeProperty': 'Describe tu propiedad...',
   'wizard.checkInInstructions': 'Instrucciones de Check-in',

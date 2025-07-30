@@ -124,7 +124,7 @@ export default {
   'wizard.zipCodePlaceholder': 'ex., 75001',
   'wizard.addressPlaceholder': 'ex., 123 Avenue Vue sur Mer',
   'wizard.cityPlaceholder': 'ex., Nice',
-  'wizard.countryPlaceholder': 'ex., France',
+  'wizard.selectCountry': 'Sélectionner le Pays',
   'wizard.propertyDescription': 'Description de la Propriété',
   'wizard.describeProperty': 'Décrivez votre propriété...',
   'wizard.checkInInstructions': 'Instructions d\'Arrivée',

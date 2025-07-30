@@ -124,7 +124,7 @@ export default {
   'wizard.zipCodePlaceholder': 'e.g., 90401',
   'wizard.addressPlaceholder': 'e.g., 123 Ocean View Drive',
   'wizard.cityPlaceholder': 'e.g., Santa Monica',
-  'wizard.countryPlaceholder': 'e.g., USA',
+  'wizard.selectCountry': 'Select Country',
   'wizard.propertyDescription': 'Property Description',
   'wizard.describeProperty': 'Describe your property...',
   'wizard.checkInInstructions': 'Check-in Instructions',

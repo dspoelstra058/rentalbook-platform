@@ -124,7 +124,7 @@ export default {
   'wizard.zipCodePlaceholder': '例如：100001',
   'wizard.addressPlaceholder': '例如：海景大道123号',
   'wizard.cityPlaceholder': '例如：上海',
-  'wizard.countryPlaceholder': '例如：中国',
+  'wizard.selectCountry': '选择国家',
   'wizard.propertyDescription': '房产描述',
   'wizard.describeProperty': '描述您的房产...',
   'wizard.checkInInstructions': '入住指导',

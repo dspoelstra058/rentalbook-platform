@@ -205,7 +205,7 @@ export const AdminPanel: React.FC = () => {
   const addLocalInfo = async () => {
     // Validate required fields
     if (!newLocalInfo.name || !newLocalInfo.address || !newLocalInfo.city || !newLocalInfo.country || !newLocalInfo.description) {
-      alert('Please fill in all required fields (Name, Address, City, Country, Description)');
+      alert(t('admin.fillRequiredFields'));
       return;
     }
 
@@ -260,7 +260,7 @@ export const AdminPanel: React.FC = () => {
       setShowAddLocalInfo(false);
     } catch (err) {
       console.error('Error adding local info:', err);
-      alert('Failed to add local information');
+      alert(t('admin.failedToAdd'));
     } finally {
       setIsSubmitting(false);
     }
@@ -535,11 +535,11 @@ export const AdminPanel: React.FC = () => {
       {/* Add Local Info Form */}
       {showAddLocalInfo && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Local Information</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.addLocalInfoForm')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
-              placeholder="Name *"
+              placeholder={`${t('admin.name')} *`}
               value={newLocalInfo.name}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, name: e.target.value})}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -550,19 +550,19 @@ export const AdminPanel: React.FC = () => {
               onChange={(e) => setNewLocalInfo({...newLocalInfo, category: e.target.value as any})}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="restaurant">Restaurant</option>
-              <option value="pharmacy">Pharmacy</option>
-              <option value="supermarket">Supermarket</option>
-              <option value="hospital">Hospital</option>
-              <option value="doctor">Doctor</option>
-              <option value="attraction">Attraction</option>
-              <option value="beach">Beach</option>
-              <option value="activity">Activity</option>
+              <option value="restaurant">{t('categories.restaurant')}</option>
+              <option value="pharmacy">{t('categories.pharmacy')}</option>
+              <option value="supermarket">{t('categories.supermarket')}</option>
+              <option value="hospital">{t('categories.hospital')}</option>
+              <option value="doctor">{t('categories.doctor')}</option>
+              <option value="attraction">{t('categories.attraction')}</option>
+              <option value="beach">{t('categories.beach')}</option>
+              <option value="activity">{t('categories.activity')}</option>
             </select>
             
             <input
               type="text"
-              placeholder="Address *"
+              placeholder={`${t('admin.address')} *`}
               value={newLocalInfo.address}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, address: e.target.value})}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -571,7 +571,7 @@ export const AdminPanel: React.FC = () => {
             
             <input
               type="text"
-              placeholder="Phone"
+              placeholder={t('admin.phone')}
               value={newLocalInfo.phone}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, phone: e.target.value})}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -579,7 +579,7 @@ export const AdminPanel: React.FC = () => {
             
             <input
               type="text"
-              placeholder="Website"
+              placeholder={t('admin.website')}
               value={newLocalInfo.website}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, website: e.target.value})}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -587,7 +587,7 @@ export const AdminPanel: React.FC = () => {
             
             <input
               type="text"
-              placeholder="City *"
+              placeholder={`${t('admin.city')} *`}
               value={newLocalInfo.city}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, city: e.target.value})}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -600,7 +600,7 @@ export const AdminPanel: React.FC = () => {
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
-              <option value="">Select Country *</option>
+              <option value="">{t('admin.selectCountry')} *</option>
               {countries.map(country => (
                 <option key={country} value={country}>{country}</option>
               ))}
@@ -608,7 +608,7 @@ export const AdminPanel: React.FC = () => {
             
             <input
               type="text"
-              placeholder="Rating (0-5)"
+              placeholder={t('admin.rating')}
               value={newLocalInfo.rating}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, rating: e.target.value})}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -619,7 +619,7 @@ export const AdminPanel: React.FC = () => {
             
             {/* Opening Hours Section */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Opening Hours</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.openingHours')}</label>
               <div className="space-y-3">
                 <div className="flex items-center">
                   <input
@@ -629,13 +629,13 @@ export const AdminPanel: React.FC = () => {
                     onChange={(e) => setNewLocalInfo({...newLocalInfo, is24Hours: e.target.checked})}
                     className="mr-2"
                   />
-                  <label htmlFor="is24Hours" className="text-sm text-gray-700">Open 24 hours</label>
+                  <label htmlFor="is24Hours" className="text-sm text-gray-700">{t('admin.open24Hours')}</label>
                 </div>
                 
                 {!newLocalInfo.is24Hours && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Open Time</label>
+                      <label className="block text-xs text-gray-500 mb-1">{t('admin.openTime')}</label>
                       <select
                         value={newLocalInfo.openTime}
                         onChange={(e) => setNewLocalInfo({...newLocalInfo, openTime: e.target.value})}
@@ -647,7 +647,7 @@ export const AdminPanel: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-500 mb-1">Close Time</label>
+                      <label className="block text-xs text-gray-500 mb-1">{t('admin.closeTime')}</label>
                       <select
                         value={newLocalInfo.closeTime}
                         onChange={(e) => setNewLocalInfo({...newLocalInfo, closeTime: e.target.value})}
@@ -664,7 +664,7 @@ export const AdminPanel: React.FC = () => {
             </div>
             
             <textarea
-              placeholder="Description *"
+              placeholder={`${t('admin.description')} *`}
               value={newLocalInfo.description}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, description: e.target.value})}
               className="md:col-span-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -681,7 +681,7 @@ export const AdminPanel: React.FC = () => {
               onChange={(e) => setNewLocalInfo({...newLocalInfo, verified: e.target.checked})}
               className="mr-2"
             />
-            <label htmlFor="verified" className="text-sm text-gray-700">Verified</label>
+            <label htmlFor="verified" className="text-sm text-gray-700">{t('admin.verified')}</label>
           </div>
           
           <div className="flex justify-end space-x-2 mt-4">
@@ -689,7 +689,7 @@ export const AdminPanel: React.FC = () => {
               onClick={() => setShowAddLocalInfo(false)}
               className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
             >
-              Cancel
+              {t('admin.cancel')}
             </button>
             <button
               onClick={addLocalInfo}
@@ -699,9 +699,9 @@ export const AdminPanel: React.FC = () => {
               {isSubmitting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                  Adding...
+                  {t('admin.adding')}
                 </>
-              ) : 'Add Local Info'}
+              ) : t('admin.addLocalInfoBtn')}
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Users, Database, Settings, Plus, Edit, Trash2, Check, X, BarChart3, Upload, Download } from 'lucide-react';
+import { Users, Database, Settings, Plus, Edit, Trash2, Check, X, BarChart3, Upload, Download, Home, Eye, Globe } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
@@ -57,10 +57,19 @@ interface Property {
   id: string;
   owner_id: string;
   name: string;
+  address: string;
   city: string;
   country: string;
+  description: string;
+  checkin_instructions: string;
+  wifi_password: string;
+  house_rules: string;
+  emergency_contacts: string;
+  template_id: string;
   is_published: boolean;
+  website_url: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 interface LocalInfo {
@@ -93,11 +102,14 @@ export const AdminPanel: React.FC = () => {
   const [showAddLocalInfo, setShowAddLocalInfo] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
+  const [showAddProperty, setShowAddProperty] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [userFormError, setUserFormError] = useState<string | null>(null);
   const [localInfoFormError, setLocalInfoFormError] = useState<string | null>(null);
+  const [propertyFormError, setPropertyFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [newUser, setNewUser] = useState({
     name: '',
@@ -122,11 +134,27 @@ export const AdminPanel: React.FC = () => {
     openTime: '09:00',
     closeTime: '17:00'
   });
+  const [newProperty, setNewProperty] = useState({
+    name: '',
+    address: '',
+    city: '',
+    country: '',
+    description: '',
+    checkin_instructions: '',
+    wifi_password: '',
+    house_rules: '',
+    emergency_contacts: '',
+    template_id: 'modern-blue',
+    is_published: false,
+    website_url: '',
+    owner_id: ''
+  });
 
   useEffect(() => {
     // Set active tab based on URL
     const path = location.pathname;
     if (path.includes('/users')) setActiveTab('users');
+    else if (path.includes('/properties')) setActiveTab('properties');
     else if (path.includes('/local-info')) setActiveTab('local-info');
     else if (path.includes('/settings')) setActiveTab('settings');
     else setActiveTab('dashboard');
@@ -153,7 +181,10 @@ export const AdminPanel: React.FC = () => {
       // Load properties
       const { data: propertiesData, error: propertiesError } = await supabase
         .from('properties')
-        .select('*')
+        .select(`
+          *,
+          users!properties_owner_id_fkey(name, email)
+        `)
         .order('created_at', { ascending: false });
 
       if (propertiesError) throw propertiesError;

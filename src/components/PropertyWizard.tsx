@@ -124,25 +124,30 @@ export const PropertyWizard: React.FC = () => {
   // Load local info when city or country changes
   useEffect(() => {
     const loadLocalInfo = async () => {
-      if (!formData.city || !formData.country) {
+      if (!formData.city?.trim() || !formData.country?.trim()) {
         setAvailableLocalInfo([]);
         return;
       }
 
       setLoadingLocalInfo(true);
       try {
+        console.log('Loading local info for:', formData.city, formData.country);
+        
         const { data, error } = await supabase
           .from('local_info')
           .select('*')
-          .eq('city', formData.city)
-          .eq('country', formData.country)
+          .ilike('city', `%${formData.city.trim()}%`)
+          .ilike('country', `%${formData.country.trim()}%`)
           .eq('verified', true)
           .order('name');
+
+        console.log('Supabase query result:', { data, error });
 
         if (error) {
           console.error('Error loading local info:', error);
           setAvailableLocalInfo([]);
         } else {
+          console.log('Found local info entries:', data?.length || 0);
           // Transform database data to LocalInfo interface
           const transformedData: LocalInfo[] = (data || []).map(item => ({
             id: item.id,
@@ -236,7 +241,10 @@ export const PropertyWizard: React.FC = () => {
                 <input
                   type="text"
                   value={formData.city}
-                  onChange={(e) => updateFormData({ city: e.target.value })}
+                  onChange={(e) => {
+                    console.log('City changed to:', e.target.value);
+                    updateFormData({ city: e.target.value });
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder={t('wizard.cityPlaceholder')}
                 />
@@ -247,7 +255,10 @@ export const PropertyWizard: React.FC = () => {
                 </label>
                 <select
                   value={formData.country}
-                  onChange={(e) => updateFormData({ country: e.target.value })}
+                  onChange={(e) => {
+                    console.log('Country changed to:', e.target.value);
+                    updateFormData({ country: e.target.value });
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
@@ -351,6 +362,14 @@ export const PropertyWizard: React.FC = () => {
                 <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p>{t('wizard.noLocalInfo')}</p>
                 <p className="text-sm mt-2">{t('wizard.noLocalInfoDesc').replace('{city}', formData.city || '').replace('{country}', formData.country || '')}</p>
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Debug Info:</strong><br/>
+                    City: "{formData.city}"<br/>
+                    Country: "{formData.country}"<br/>
+                    Check browser console for more details.
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">

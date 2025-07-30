@@ -192,6 +192,8 @@ export default {
   'wizard.selectedLocalInfo': 'local information entries selected',
   'wizard.chooseTemplate': 'Choose a template for your information book:',
   'wizard.readyToPublish': 'Ready to Publish',
+  'wizard.emergencyContacts': 'Emergency Contacts',
+  'wizard.emergencyContactsPlaceholder': 'Emergency contact information for guests...',
   'wizard.completePayment': 'Complete payment to generate your information book website and PDF.',
   'wizard.orderSummary': 'Order Summary',
   'wizard.bookCreation': 'Information Book Creation',

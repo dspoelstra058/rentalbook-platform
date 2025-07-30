@@ -192,6 +192,8 @@ export default {
   'wizard.selectedLocalInfo': '已选择的本地信息条目',
   'wizard.chooseTemplate': '为您的信息手册选择模板：',
   'wizard.readyToPublish': '准备发布',
+  'wizard.emergencyContacts': '紧急联系人',
+  'wizard.emergencyContactsPlaceholder': '客人的紧急联系信息...',
   'wizard.completePayment': '完成支付以生成您的信息手册网站和PDF。',
   'wizard.orderSummary': '订单摘要',
   'wizard.bookCreation': '信息手册创建',

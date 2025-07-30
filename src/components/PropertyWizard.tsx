@@ -42,7 +42,6 @@ interface WizardStep {
   icon: React.ElementType;
 }
 
-
 export const PropertyWizard: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -173,6 +172,20 @@ export const PropertyWizard: React.FC = () => {
     loadLocalInfo();
   }, [formData.city, formData.country]);
 
+  // Helper function to get category colors
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      doctor: 'bg-red-100 text-red-800',
+      pharmacy: 'bg-green-100 text-green-800',
+      supermarket: 'bg-blue-100 text-blue-800',
+      restaurant: 'bg-orange-100 text-orange-800',
+      hospital: 'bg-red-100 text-red-800',
+      attraction: 'bg-purple-100 text-purple-800',
+      beach: 'bg-cyan-100 text-cyan-800',
+      activity: 'bg-yellow-100 text-yellow-800'
+    };
+    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  };
 
   const renderStepContent = () => {
     switch (steps[currentStep].id) {
@@ -301,6 +314,18 @@ export const PropertyWizard: React.FC = () => {
                 placeholder={t('wizard.importantRules')}
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('wizard.emergencyContacts')}
+              </label>
+              <textarea
+                value={formData.emergencyContacts}
+                onChange={(e) => updateFormData({ emergencyContacts: e.target.value })}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder={t('wizard.emergencyContactsPlaceholder')}
+              />
+            </div>
           </div>
         );
 
@@ -325,13 +350,13 @@ export const PropertyWizard: React.FC = () => {
               <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
                 <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p>{t('wizard.noLocalInfo')}</p>
-                <p className="text-sm mt-2">{t('wizard.noLocalInfoDesc', { city: formData.city, country: formData.country })}</p>
+                <p className="text-sm mt-2">{t('wizard.noLocalInfoDesc').replace('{city}', formData.city || '').replace('{country}', formData.country || '')}</p>
               </div>
             ) : (
               <div className="space-y-4">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm text-blue-800">
-                    <strong>{availableLocalInfo.length}</strong> {t('wizard.localInfoFound', { city: formData.city, country: formData.country })}
+                    <strong>{availableLocalInfo.length}</strong> {t('wizard.localInfoFound').replace('{city}', formData.city || '').replace('{country}', formData.country || '')}
                   </p>
                 </div>
                 
@@ -467,85 +492,6 @@ export const PropertyWizard: React.FC = () => {
             </div>
           </div>
         );
-                  <label
-                    key={info.id}
-                    className="flex items-start space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedLocalInfo.includes(info.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedLocalInfo([...selectedLocalInfo, info.id]);
-                        } else {
-                          setSelectedLocalInfo(selectedLocalInfo.filter(id => id !== info.id));
-                        }
-                      }}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <h4 className="font-medium text-gray-900">{info.name}</h4>
-                        <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full capitalize">
-                          {info.category}
-                        </span>
-                        {info.verified && (
-                          <Check className="h-4 w-4 text-green-500" />
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{info.description}</p>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {info.address} • {info.phone} • {info.openingHours}
-                      </div>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-
-      case 'template':
-        return (
-          <div className="space-y-6">
-            <div className="text-sm text-gray-600 mb-4">
-              {t('wizard.chooseTemplateText')}
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {templates.map((template) => (
-                <label
-                  key={template.id}
-                  className={`relative cursor-pointer rounded-lg border-2 p-4 ${
-                    formData.templateId === template.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="template"
-                    value={template.id}
-                    checked={formData.templateId === template.id}
-                    onChange={(e) => updateFormData({ templateId: e.target.value })}
-                    className="sr-only"
-                  />
-                  <div className="aspect-video bg-gradient-to-br rounded-md mb-3"
-                    style={{
-                      background: `linear-gradient(135deg, ${template.colors.primary}, ${template.colors.secondary})`
-                    }}
-                  />
-                  <h4 className="font-medium text-gray-900">{template.name}</h4>
-                  <p className="text-sm text-gray-500 capitalize">{template.category} style</p>
-                  {formData.templateId === template.id && (
-                    <div className="absolute top-2 right-2 bg-blue-500 text-white rounded-full p-1">
-                      <Check className="h-3 w-3" />
-                    </div>
-                  )}
-                </label>
-              ))}
-            </div>
-          </div>
-        );
 
       case 'payment':
         return (
@@ -609,21 +555,6 @@ export const PropertyWizard: React.FC = () => {
       default:
         return null;
     }
-  };
-
-  // Helper function to get category colors
-  const getCategoryColor = (category: string) => {
-    const colors = {
-      doctor: 'bg-red-100 text-red-800',
-      pharmacy: 'bg-green-100 text-green-800',
-      supermarket: 'bg-blue-100 text-blue-800',
-      restaurant: 'bg-orange-100 text-orange-800',
-      hospital: 'bg-red-100 text-red-800',
-      attraction: 'bg-purple-100 text-purple-800',
-      beach: 'bg-cyan-100 text-cyan-800',
-      activity: 'bg-yellow-100 text-yellow-800'
-    };
-    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
   return (

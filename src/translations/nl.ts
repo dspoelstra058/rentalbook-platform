@@ -192,6 +192,8 @@ export default {
   'wizard.selectedLocalInfo': 'lokale informatie-items geselecteerd',
   'wizard.chooseTemplate': 'Kies een sjabloon voor je informatieboek:',
   'wizard.readyToPublish': 'Klaar om te Publiceren',
+  'wizard.emergencyContacts': 'Noodcontacten',
+  'wizard.emergencyContactsPlaceholder': 'Noodcontactinformatie voor gasten...',
   'wizard.completePayment': 'Voltooi de betaling om je informatieboek website en PDF te genereren.',
   'wizard.orderSummary': 'Besteloverzicht',
   'wizard.bookCreation': 'Informatieboek Creatie',

@@ -192,6 +192,8 @@ export default {
   'wizard.selectedLocalInfo': 'lokale Informationseinträge ausgewählt',
   'wizard.chooseTemplate': 'Wählen Sie eine Vorlage für Ihr Informationsbuch:',
   'wizard.readyToPublish': 'Bereit zum Veröffentlichen',
+  'wizard.emergencyContacts': 'Notfallkontakte',
+  'wizard.emergencyContactsPlaceholder': 'Notfallkontaktinformationen für Gäste...',
   'wizard.completePayment': 'Schließen Sie die Zahlung ab, um Ihre Informationsbuch-Website und PDF zu generieren.',
   'wizard.orderSummary': 'Bestellübersicht',
   'wizard.bookCreation': 'Informationsbuch Erstellung',

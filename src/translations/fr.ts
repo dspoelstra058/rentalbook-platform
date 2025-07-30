@@ -202,4 +202,5 @@ export default {
   'error.invalidCredentials': 'Identifiants invalides',
   'error.passwordsNotMatch': 'Les mots de passe ne correspondent pas',
   'error.genericError': 'Une erreur s\'est produite',
+  'error.emailNotConfirmed': 'Votre adresse e-mail n\'a pas été confirmée. Veuillez vérifier votre boîte de réception pour un lien de confirmation.',
 };

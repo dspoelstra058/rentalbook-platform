@@ -202,4 +202,5 @@ export default {
   'error.invalidCredentials': 'Ongeldige inloggegevens',
   'error.passwordsNotMatch': 'Wachtwoorden komen niet overeen',
   'error.genericError': 'Er is een fout opgetreden',
+  'error.emailNotConfirmed': 'Uw e-mailadres is nog niet bevestigd. Controleer uw inbox voor een bevestigingslink.',
 };

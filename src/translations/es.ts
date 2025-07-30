@@ -202,4 +202,5 @@ export default {
   'error.invalidCredentials': 'Credenciales inválidas',
   'error.passwordsNotMatch': 'Las contraseñas no coinciden',
   'error.genericError': 'Ocurrió un error',
+  'error.emailNotConfirmed': 'Tu dirección de correo electrónico no ha sido confirmada. Por favor revisa tu bandeja de entrada para encontrar el enlace de confirmación.',
 };

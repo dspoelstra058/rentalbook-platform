@@ -202,4 +202,5 @@ export default {
   'error.invalidCredentials': 'Ungültige Anmeldedaten',
   'error.passwordsNotMatch': 'Passwörter stimmen nicht überein',
   'error.genericError': 'Ein Fehler ist aufgetreten',
+  'error.emailNotConfirmed': 'Ihre E-Mail-Adresse wurde noch nicht bestätigt. Bitte überprüfen Sie Ihren Posteingang auf einen Bestätigungslink.',
 };

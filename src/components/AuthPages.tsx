@@ -45,7 +45,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t('error.genericError');
-      if (errorMessage.includes('Invalid login credentials')) {
+      if (errorMessage === 'EMAIL_NOT_CONFIRMED') {
+        setError(t('error.emailNotConfirmed'));
+      } else if (errorMessage.includes('Invalid login credentials')) {
         setError(t('error.invalidCredentials'));
       } else {
         setError(errorMessage);

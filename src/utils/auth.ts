@@ -96,6 +96,9 @@ class AuthService {
       });
 
       if (error) {
+        if (error.message === 'Email not confirmed') {
+          throw new Error('EMAIL_NOT_CONFIRMED');
+        }
         throw new Error(error.message);
       }
 

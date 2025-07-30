@@ -202,4 +202,5 @@ export default {
   'error.invalidCredentials': '无效凭据',
   'error.passwordsNotMatch': '密码不匹配',
   'error.genericError': '发生错误',
+  'error.emailNotConfirmed': '您的邮箱地址尚未确认。请检查您的收件箱以获取确认链接。',
 };

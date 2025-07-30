@@ -121,6 +121,7 @@ export default {
   'wizard.paymentPublishDesc': 'Completa el pago para publicar',
   'wizard.propertyName': 'Nombre de la Propiedad',
   'wizard.propertyNamePlaceholder': 'ej., Villa Junto al Mar',
+  'wizard.zipCodePlaceholder': 'ej., 28001',
   'wizard.addressPlaceholder': 'ej., Calle Vista al Mar 123',
   'wizard.cityPlaceholder': 'ej., Barcelona',
   'wizard.countryPlaceholder': 'ej., España',

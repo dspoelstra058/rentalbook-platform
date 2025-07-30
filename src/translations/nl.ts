@@ -121,6 +121,7 @@ export default {
   'wizard.paymentPublishDesc': 'Voltooi betaling om te publiceren',
   'wizard.propertyName': 'Accommodatienaam',
   'wizard.propertyNamePlaceholder': 'bijv., Villa aan Zee',
+  'wizard.zipCodePlaceholder': 'bijv., 1234 AB',
   'wizard.addressPlaceholder': 'bijv., Zeezichtlaan 123',
   'wizard.cityPlaceholder': 'bijv., Amsterdam',
   'wizard.countryPlaceholder': 'bijv., Nederland',

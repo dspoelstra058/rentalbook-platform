@@ -121,6 +121,7 @@ export default {
   'wizard.paymentPublishDesc': 'Complétez le paiement pour publier',
   'wizard.propertyName': 'Nom de la Propriété',
   'wizard.propertyNamePlaceholder': 'ex., Villa en Bord de Mer',
+  'wizard.zipCodePlaceholder': 'ex., 75001',
   'wizard.addressPlaceholder': 'ex., 123 Avenue Vue sur Mer',
   'wizard.cityPlaceholder': 'ex., Nice',
   'wizard.countryPlaceholder': 'ex., France',

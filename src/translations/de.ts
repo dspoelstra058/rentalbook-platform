@@ -121,6 +121,7 @@ export default {
   'wizard.paymentPublishDesc': 'Zahlung abschließen zum Veröffentlichen',
   'wizard.propertyName': 'Immobilienname',
   'wizard.propertyNamePlaceholder': 'z.B., Villa am Meer',
+  'wizard.zipCodePlaceholder': 'z.B., 12345',
   'wizard.addressPlaceholder': 'z.B., Meerblickstraße 123',
   'wizard.cityPlaceholder': 'z.B., München',
   'wizard.countryPlaceholder': 'z.B., Deutschland',

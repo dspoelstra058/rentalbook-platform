@@ -121,6 +121,7 @@ export default {
   'wizard.paymentPublishDesc': '完成支付以发布',
   'wizard.propertyName': '房产名称',
   'wizard.propertyNamePlaceholder': '例如：海滨别墅',
+  'wizard.zipCodePlaceholder': '例如：100001',
   'wizard.addressPlaceholder': '例如：海景大道123号',
   'wizard.cityPlaceholder': '例如：上海',
   'wizard.countryPlaceholder': '例如：中国',

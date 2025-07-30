@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Check, MapPin, Home, FileText, Palette, CreditCard } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Property, LocalInfo, Template } from '../types';
 import { templates, mockLocalInfo } from '../utils/data';
 
@@ -46,10 +47,12 @@ const steps: WizardStep[] = [
 
 export const PropertyWizard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<Property>>({
     name: '',
     address: '',
+    zipCode: '',
     city: '',
     country: '',
     description: '',
@@ -96,14 +99,14 @@ export const PropertyWizard: React.FC = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Property Name
+                {t('wizard.propertyName')}
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => updateFormData({ name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Seaside Villa"
+                placeholder={t('wizard.propertyNamePlaceholder')}
               />
             </div>
             <div>
@@ -115,7 +118,7 @@ export const PropertyWizard: React.FC = () => {
                 value={formData.address}
                 onChange={(e) => updateFormData({ address: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 123 Ocean View Drive"
+                placeholder={t('wizard.addressPlaceholder')}
               />
             </div>
             <div>
@@ -127,32 +130,32 @@ export const PropertyWizard: React.FC = () => {
                 value={formData.zipCode}
                 onChange={(e) => updateFormData({ zipCode: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 90401"
+                placeholder={t('wizard.zipCodePlaceholder')}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  City
+                  {t('common.city')}
                 </label>
                 <input
                   type="text"
                   value={formData.city}
                   onChange={(e) => updateFormData({ city: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Santa Monica"
+                  placeholder={t('wizard.cityPlaceholder')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Country
+                  {t('common.country')}
                 </label>
                 <input
                   type="text"
                   value={formData.country}
                   onChange={(e) => updateFormData({ country: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., USA"
+                  placeholder={t('wizard.countryPlaceholder')}
                 />
               </div>
             </div>

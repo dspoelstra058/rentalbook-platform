@@ -121,6 +121,7 @@ export default {
   'wizard.paymentPublishDesc': 'Complete payment to publish',
   'wizard.propertyName': 'Property Name',
   'wizard.propertyNamePlaceholder': 'e.g., Seaside Villa',
+  'wizard.zipCodePlaceholder': 'e.g., 90401',
   'wizard.addressPlaceholder': 'e.g., 123 Ocean View Drive',
   'wizard.cityPlaceholder': 'e.g., Santa Monica',
   'wizard.countryPlaceholder': 'e.g., USA',

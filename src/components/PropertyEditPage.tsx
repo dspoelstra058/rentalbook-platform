@@ -465,19 +465,6 @@ export const PropertyEditPage: React.FC = () => {
             )}
           </div>
         );
-                </div>
-              ))}
-            </div>
-            
-            {formData.facilities && formData.facilities.length > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  <strong>{formData.facilities.length}</strong> facilities selected
-                </p>
-              </div>
-            )}
-          </div>
-        );
 
       case 'images':
         return (

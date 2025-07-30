@@ -212,8 +212,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
               {t('auth.demoCredentials')}
             </h3>
             <div className="text-xs text-blue-700 space-y-1">
-              <p><strong>Admin:</strong> admin@example.com / admin123</p>
-              <p><strong>Owner:</strong> owner@example.com / owner123</p>
+              <p><strong>Admin:</strong> admin@platform.com / admin123</p>
             </div>
             <p className="text-xs text-blue-600 mt-2">
               Or create a new account using the registration form.

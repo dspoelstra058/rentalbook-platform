@@ -136,7 +136,8 @@ export const PropertyWizard: React.FC = () => {
         const { data, error } = await supabase
           .from('local_info')
           .select('*')
-          .and(`city.ilike.%${formData.city.trim()}%,country.ilike.%${formData.country.trim()}%`)
+          .ilike('city', `%${formData.city.trim()}%`)
+          .ilike('country', `%${formData.country.trim()}%`)
           .eq('verified', true)
           .order('name');
 

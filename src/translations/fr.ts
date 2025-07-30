@@ -253,6 +253,8 @@ export default {
   'admin.templateColumns': 'Nom,Catégorie,Adresse,Téléphone,Site Web,Description,Ville,Pays,Note,Heures d\'Ouverture,Vérifié',
 
   // User Management
+  'admin.editLocalInfo': 'Modifier les Informations Locales',
+  'admin.deleteLocalInfo': 'Supprimer les Informations Locales',
   'admin.addUser': 'Ajouter Utilisateur',
   'admin.addUserForm': 'Ajouter Nouvel Utilisateur',
   'admin.fullName': 'Nom Complet',

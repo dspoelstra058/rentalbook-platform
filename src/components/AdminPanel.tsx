@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Users, Database, Settings, Plus, Edit, Trash2, Check, X, BarChart3, Upload, Download, Home, Eye, Globe } from 'lucide-react';
+import { Plus, Users, Database, Settings, Upload, Download, Check, Trash2, Edit } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
@@ -927,6 +927,13 @@ export const AdminPanel: React.FC = () => {
                           className="text-red-600 hover:text-red-900"
                         >
                           <Trash2 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEditLocalInfo(info)}
+                          className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                          title={t('admin.editLocalInfo')}
+                        >
+                          <Edit className="h-4 w-4" />
                         </button>
                       </div>
                     </td>

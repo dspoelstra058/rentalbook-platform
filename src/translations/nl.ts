@@ -253,6 +253,8 @@ export default {
   'admin.templateColumns': 'Naam,Categorie,Adres,Telefoon,Website,Beschrijving,Stad,Land,Beoordeling,Openingstijden,Geverifieerd',
 
   // User Management
+  'admin.editLocalInfo': 'Lokale Informatie Bewerken',
+  'admin.deleteLocalInfo': 'Lokale Informatie Verwijderen',
   'admin.addUser': 'Gebruiker Toevoegen',
   'admin.addUserForm': 'Nieuwe Gebruiker Toevoegen',
   'admin.fullName': 'Volledige Naam',

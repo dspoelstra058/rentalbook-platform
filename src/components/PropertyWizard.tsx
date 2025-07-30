@@ -138,7 +138,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
     setIsLoadingProperty(true);
     try {
       const { data, error } = await supabase
-          images: formData.images || { front: '', general: [], back: '' },
         .from('properties')
         .select('*')
         .eq('id', propertyId)
@@ -215,6 +214,7 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
             emergency_contacts: formData.emergencyContacts || '',
             template_id: formData.templateId || 'modern-blue',
             facilities: formData.facilities || [],
+            images: formData.images || { front: '', general: [], back: '' },
             updated_at: new Date().toISOString()
           })
           .eq('id', propertyId)
@@ -241,6 +241,7 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
             emergency_contacts: formData.emergencyContacts || '',
             template_id: formData.templateId || 'modern-blue',
             facilities: formData.facilities || [],
+            images: formData.images || { front: '', general: [], back: '' },
             is_published: true, // Assuming published after payment
             website_url: null // Will be generated later
           })
@@ -272,60 +273,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
 
   const updateFormData = (updates: Partial<Property>) => {
     setFormData(prev => ({ ...prev, ...updates }));
-  };
-
-  const handleImageUpload = (type: 'front' | 'back' | 'general', index?: number) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const imageUrl = e.target?.result as string;
-          const currentImages = formData.images || { front: '', general: [], back: '' };
-          
-          if (type === 'front') {
-            updateFormData({
-              images: { ...currentImages, front: imageUrl }
-            });
-          } else if (type === 'back') {
-            updateFormData({
-              images: { ...currentImages, back: imageUrl }
-            });
-          } else if (type === 'general' && typeof index === 'number') {
-            const newGeneral = [...(currentImages.general || [])];
-            newGeneral[index] = imageUrl;
-            updateFormData({
-              images: { ...currentImages, general: newGeneral }
-            });
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-    input.click();
-  };
-
-  const removeImage = (type: 'front' | 'back' | 'general', index?: number) => {
-    const currentImages = formData.images || { front: '', general: [], back: '' };
-    
-    if (type === 'front') {
-      updateFormData({
-        images: { ...currentImages, front: '' }
-      });
-    } else if (type === 'back') {
-      updateFormData({
-        images: { ...currentImages, back: '' }
-      });
-    } else if (type === 'general' && typeof index === 'number') {
-      const newGeneral = [...(currentImages.general || [])];
-      newGeneral[index] = '';
-      updateFormData({
-        images: { ...currentImages, general: newGeneral }
-      });
-    }
   };
 
   // Load local info when city or country changes
@@ -607,6 +554,115 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
                 </p>
               </div>
             )}
+          </div>
+        );
+
+      case 'images':
+        return (
+          <div className="space-y-8">
+            <div className="text-sm text-gray-600 mb-4">
+              Upload images to showcase your property. You can add 1 front image, 8 general images, and 1 back image.
+            </div>
+            
+            {/* Front Image */}
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Front Image</h4>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                {formData.images?.front ? (
+                  <div className="relative">
+                    <img 
+                      src={formData.images.front} 
+                      alt="Front view" 
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => removeImage('front')}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <button
+                      onClick={() => handleImageUpload('front')}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Upload Front Image
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* General Images */}
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">General Images (8 images)</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Array.from({ length: 8 }, (_, index) => (
+                  <div key={index} className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    {formData.images?.general?.[index] ? (
+                      <div className="relative">
+                        <img 
+                          src={formData.images.general[index]} 
+                          alt={`General view ${index + 1}`} 
+                          className="w-full h-32 object-cover rounded-lg"
+                        />
+                        <button
+                          onClick={() => removeImage('general', index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <button
+                          onClick={() => handleImageUpload('general', index)}
+                          className="text-sm text-blue-600 hover:text-blue-800"
+                        >
+                          Upload
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Back Image */}
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Back Image</h4>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                {formData.images?.back ? (
+                  <div className="relative">
+                    <img 
+                      src={formData.images.back} 
+                      alt="Back view" 
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => removeImage('back')}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <button
+                      onClick={() => handleImageUpload('back')}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Upload Back Image
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         );
 

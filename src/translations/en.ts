@@ -164,6 +164,8 @@ export default {
   'wizard.propertyContentDesc': 'Description and guest instructions',
   'wizard.facilities': 'Property Facilities',
   'wizard.facilitiesDesc': 'Amenities and features available',
+  'wizard.images': 'Property Images',
+  'wizard.imagesDesc': 'Upload photos of your property',
   'wizard.localInfo': 'Local Information',
   'wizard.localInfoDesc': 'Nearby services and attractions',
   'wizard.chooseTemplate': 'Choose Template',

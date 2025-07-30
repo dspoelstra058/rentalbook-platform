@@ -44,7 +44,12 @@ export const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('error.genericError'));
+      const errorMessage = err instanceof Error ? err.message : t('error.genericError');
+      if (errorMessage.includes('Invalid login credentials')) {
+        setError(t('error.invalidCredentials'));
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

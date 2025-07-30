@@ -147,8 +147,7 @@ export const AdminPanel: React.FC = () => {
     template_id: 'modern-blue',
     is_published: false,
     website_url: '',
-    owner_id: '',
-    zip_code: ''
+    owner_id: ''
   });
 
   useEffect(() => {
@@ -583,14 +582,6 @@ export const AdminPanel: React.FC = () => {
             
             <input
               type="text"
-              placeholder={t('common.zipCode')}
-              value={newProperty.zip_code}
-              onChange={(e) => setNewProperty({...newProperty, zip_code: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            
-            <input
-              type="text"
               placeholder="City *"
               value={newProperty.city}
               onChange={(e) => setNewProperty({...newProperty, city: e.target.value})}
@@ -609,6 +600,14 @@ export const AdminPanel: React.FC = () => {
                 <option key={country} value={country}>{country}</option>
               ))}
             </select>
+            
+            <input
+              type="text"
+              placeholder="Website URL"
+              value={newProperty.website_url}
+              onChange={(e) => setNewProperty({...newProperty, website_url: e.target.value})}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
             
             <textarea
               placeholder="Description *"
@@ -631,7 +630,6 @@ export const AdminPanel: React.FC = () => {
             <label htmlFor="is_published" className="text-sm text-gray-700">Published</label>
           </div>
           
-          {/* Property Form Error */}
           {propertyFormError && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mt-4">
               {propertyFormError}
@@ -646,7 +644,7 @@ export const AdminPanel: React.FC = () => {
               Cancel
             </button>
             <button
-              onClick={() => {/* Add property logic */}}
+              onClick={addProperty}
               disabled={isSubmitting}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
@@ -729,6 +727,12 @@ export const AdminPanel: React.FC = () => {
                       >
                         <Edit className="h-4 w-4" />
                       </button>
+                      <button
+                        onClick={() => deleteProperty(property.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -739,6 +743,93 @@ export const AdminPanel: React.FC = () => {
       </div>
     </div>
   );
+
+  const addProperty = async () => {
+    setPropertyFormError(null);
+    setSuccessMessage(null);
+    
+    // Validate required fields
+    if (!newProperty.name || !newProperty.address || !newProperty.city || !newProperty.country || !newProperty.description || !newProperty.owner_id) {
+      setPropertyFormError('Please fill in all required fields');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .insert({
+          name: newProperty.name,
+          address: newProperty.address,
+          zip_code: newProperty.zip_code || null,
+          city: newProperty.city,
+          country: newProperty.country,
+          description: newProperty.description,
+          checkin_instructions: newProperty.checkin_instructions,
+          wifi_password: newProperty.wifi_password,
+          house_rules: newProperty.house_rules,
+          emergency_contacts: newProperty.emergency_contacts,
+          template_id: newProperty.template_id,
+          is_published: newProperty.is_published,
+          website_url: newProperty.website_url || null,
+          owner_id: newProperty.owner_id
+        });
+
+      if (error) throw error;
+
+      // Reload data
+      await loadData();
+      
+      // Reset form
+      setNewProperty({
+        name: '',
+        address: '',
+        city: '',
+        country: '',
+        description: '',
+        checkin_instructions: '',
+        wifi_password: '',
+        house_rules: '',
+        emergency_contacts: '',
+        template_id: 'modern-blue',
+        is_published: false,
+        website_url: '',
+        owner_id: ''
+      });
+      setShowAddProperty(false);
+      setSuccessMessage('Property added successfully');
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (err) {
+      console.error('Error adding property:', err);
+      setPropertyFormError('Failed to add property: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const deleteProperty = async (propertyId: string) => {
+    if (!confirm('Are you sure you want to delete this property?')) {
+      return;
+    }
+
+    try {
+      setError(null);
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyId);
+
+      if (error) throw error;
+
+      // Update local state
+      setProperties(properties.filter(property => property.id !== propertyId));
+    } catch (err) {
+      console.error('Error deleting property:', err);
+      setError('Failed to delete property: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    }
+  };
 
   if (loading) {
     return (
@@ -1435,13 +1526,6 @@ export const AdminPanel: React.FC = () => {
           >
             <X className="h-4 w-4" />
           </button>
-        </div>
-      )}
-
-      {/* User Form Error */}
-      {userFormError && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-          {userFormError}
         </div>
       )}
 

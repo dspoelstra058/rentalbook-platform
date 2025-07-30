@@ -223,17 +223,17 @@ export const PropertyEditPage: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'general', label: 'General Information', icon: Home },
-    { id: 'facilities', label: 'Facilities', icon: Settings },
-    { id: 'images', label: 'Images', icon: Image },
-    { id: 'template', label: 'Template', icon: Palette }
+    { id: 'general', label: t('wizard.basicInfo'), icon: Home },
+    { id: 'facilities', label: t('wizard.facilities'), icon: Settings },
+    { id: 'images', label: t('wizard.images'), icon: Image },
+    { id: 'template', label: t('wizard.chooseTemplate'), icon: Palette }
   ];
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent"></div>
-        <span className="ml-2 text-gray-600">Loading property...</span>
+        <span className="ml-2 text-gray-600">{t('common.loading')}</span>
       </div>
     );
   }
@@ -241,12 +241,12 @@ export const PropertyEditPage: React.FC = () => {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-        <p>Error: {error}</p>
+        <p>{t('error.genericError')}: {error}</p>
         <button 
           onClick={() => navigate('/dashboard')}
           className="mt-2 text-sm underline hover:no-underline"
         >
-          Back to Dashboard
+          {t('nav.dashboard')}
         </button>
       </div>
     );
@@ -259,70 +259,70 @@ export const PropertyEditPage: React.FC = () => {
           <div className="space-y-8">
             {/* Basic Information */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('wizard.basicInfo')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Property Name
+                    {t('wizard.propertyName')}
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => updateFormData({ name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., Seaside Villa"
+                    placeholder={t('wizard.propertyNamePlaceholder')}
                   />
                 </div>
                 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Address
+                    {t('common.address')}
                   </label>
                   <input
                     type="text"
                     value={formData.address}
                     onChange={(e) => updateFormData({ address: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., 123 Ocean View Drive"
+                    placeholder={t('wizard.addressPlaceholder')}
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    ZIP Code
+                    {t('common.zipCode')}
                   </label>
                   <input
                     type="text"
                     value={formData.zipCode}
                     onChange={(e) => updateFormData({ zipCode: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., 90401"
+                    placeholder={t('wizard.zipCodePlaceholder')}
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    City
+                    {t('common.city')}
                   </label>
                   <input
                     type="text"
                     value={formData.city}
                     onChange={(e) => updateFormData({ city: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., Santa Monica"
+                    placeholder={t('wizard.cityPlaceholder')}
                   />
                 </div>
                 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Country
+                    {t('common.country')}
                   </label>
                   <select
                     value={formData.country}
                     onChange={(e) => updateFormData({ country: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">Select Country</option>
+                    <option value="">{t('wizard.selectCountry')}</option>
                     {countries.map((country) => (
                       <option key={country} value={country}>
                         {country}
@@ -335,70 +335,70 @@ export const PropertyEditPage: React.FC = () => {
 
             {/* Property Content */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Property Content</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('wizard.propertyContent')}</h3>
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Property Description
+                    {t('wizard.propertyDescription')}
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => updateFormData({ description: e.target.value })}
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Describe your property..."
+                    placeholder={t('wizard.describeProperty')}
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Check-in Instructions
+                    {t('wizard.checkInInstructions')}
                   </label>
                   <textarea
                     value={formData.checkInInstructions}
                     onChange={(e) => updateFormData({ checkInInstructions: e.target.value })}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="How should guests check in?"
+                    placeholder={t('wizard.howCheckIn')}
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    WiFi Password
+                    {t('wizard.wifiPassword')}
                   </label>
                   <input
                     type="text"
                     value={formData.wifiPassword}
                     onChange={(e) => updateFormData({ wifiPassword: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="WiFi password for guests"
+                    placeholder={t('wizard.wifiPasswordPlaceholder')}
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    House Rules
+                    {t('wizard.houseRules')}
                   </label>
                   <textarea
                     value={formData.houseRules}
                     onChange={(e) => updateFormData({ houseRules: e.target.value })}
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Important rules for guests..."
+                    placeholder={t('wizard.importantRules')}
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Emergency Contacts
+                    {t('wizard.emergencyContacts')}
                   </label>
                   <textarea
                     value={formData.emergencyContacts}
                     onChange={(e) => updateFormData({ emergencyContacts: e.target.value })}
                     rows={2}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Emergency contact information for guests..."
+                    placeholder={t('wizard.emergencyContactsPlaceholder')}
                   />
                 </div>
               </div>
@@ -409,7 +409,7 @@ export const PropertyEditPage: React.FC = () => {
       case 'facilities':
         return (
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Property Facilities</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('wizard.facilities')}</h3>
             <div className="space-y-6 max-h-96 overflow-y-auto">
               {facilityCategories.map((category) => (
                 <div key={category.id} className="border border-gray-200 rounded-lg overflow-hidden">
@@ -421,7 +421,7 @@ export const PropertyEditPage: React.FC = () => {
                       />
                       {category.name}
                       <span className="ml-auto text-sm text-gray-500">
-                        {formData.facilities?.filter(f => category.facilities.some(cf => cf.id === f)).length || 0} selected
+                        {formData.facilities?.filter(f => category.facilities.some(cf => cf.id === f)).length || 0} {t('common.selected')}
                       </span>
                     </h4>
                   </div>
@@ -459,7 +459,7 @@ export const PropertyEditPage: React.FC = () => {
             {formData.facilities && formData.facilities.length > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  <strong>{formData.facilities.length}</strong> facilities selected
+                  <strong>{formData.facilities.length}</strong> {t('wizard.facilitiesSelected')}
                 </p>
               </div>
             )}
@@ -469,17 +469,17 @@ export const PropertyEditPage: React.FC = () => {
       case 'images':
         return (
           <div className="space-y-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Property Images</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('wizard.images')}</h3>
             
             {/* Front Image */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Front Image</h4>
+              <h4 className="font-medium text-gray-900 mb-3">{t('wizard.frontImage')}</h4>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                 {formData.images?.front ? (
                   <div className="relative">
                     <img 
                       src={formData.images.front} 
-                      alt="Front view" 
+                      alt={t('wizard.frontImage')} 
                       className="w-full h-48 object-cover rounded-lg"
                     />
                     <button
@@ -496,7 +496,7 @@ export const PropertyEditPage: React.FC = () => {
                       onClick={() => handleImageUpload('front')}
                       className="text-blue-600 hover:text-blue-800 font-medium"
                     >
-                      Upload Front Image
+                      {t('wizard.uploadFrontImage')}
                     </button>
                   </div>
                 )}
@@ -505,7 +505,7 @@ export const PropertyEditPage: React.FC = () => {
 
             {/* General Images */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">General Images (8 images)</h4>
+              <h4 className="font-medium text-gray-900 mb-3">{t('wizard.generalImages')}</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {Array.from({ length: 8 }, (_, index) => (
                   <div key={index} className="border-2 border-dashed border-gray-300 rounded-lg p-4">
@@ -513,7 +513,7 @@ export const PropertyEditPage: React.FC = () => {
                       <div className="relative">
                         <img 
                           src={formData.images.general[index]} 
-                          alt={`General view ${index + 1}`} 
+                          alt={`${t('wizard.generalView')} ${index + 1}`} 
                           className="w-full h-32 object-cover rounded-lg"
                         />
                         <button
@@ -530,7 +530,7 @@ export const PropertyEditPage: React.FC = () => {
                           onClick={() => handleImageUpload('general', index)}
                           className="text-sm text-blue-600 hover:text-blue-800"
                         >
-                          Upload
+                          {t('common.upload')}
                         </button>
                       </div>
                     )}
@@ -541,13 +541,13 @@ export const PropertyEditPage: React.FC = () => {
 
             {/* Back Image */}
             <div>
-              <h4 className="font-medium text-gray-900 mb-3">Back Image</h4>
+              <h4 className="font-medium text-gray-900 mb-3">{t('wizard.backImage')}</h4>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                 {formData.images?.back ? (
                   <div className="relative">
                     <img 
                       src={formData.images.back} 
-                      alt="Back view" 
+                      alt={t('wizard.backImage')} 
                       className="w-full h-48 object-cover rounded-lg"
                     />
                     <button
@@ -564,7 +564,7 @@ export const PropertyEditPage: React.FC = () => {
                       onClick={() => handleImageUpload('back')}
                       className="text-blue-600 hover:text-blue-800 font-medium"
                     >
-                      Upload Back Image
+                      {t('wizard.uploadBackImage')}
                     </button>
                   </div>
                 )}
@@ -578,7 +578,7 @@ export const PropertyEditPage: React.FC = () => {
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <Palette className="h-5 w-5 mr-2" />
-              Template Selection
+              {t('wizard.chooseTemplate')}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {templates.map((template) => (
@@ -632,11 +632,11 @@ export const PropertyEditPage: React.FC = () => {
             className="flex items-center text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Dashboard
+            {t('nav.dashboard')}
           </button>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Edit Property</h1>
-        <p className="text-gray-600">Update your property information</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('properties.editProperty')}</h1>
+        <p className="text-gray-600">{t('wizard.updatePropertyInfo')}</p>
       </div>
 
       {/* Tabs */}
@@ -673,7 +673,7 @@ export const PropertyEditPage: React.FC = () => {
             onClick={() => navigate('/dashboard')}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleSave}
@@ -683,12 +683,12 @@ export const PropertyEditPage: React.FC = () => {
             {isSaving ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                Saving...
+                {t('settings.saving')}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Save Changes
+                {t('settings.saveChanges')}
               </>
             )}
           </button>

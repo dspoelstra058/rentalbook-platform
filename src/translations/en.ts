@@ -207,6 +207,18 @@ export default {
   'wizard.completePaymentBtn': 'Complete Payment',
   'wizard.processing': 'Processing...',
 
+  // Property Edit Page
+  'wizard.updatePropertyInfo': 'Update your property information',
+  'wizard.frontImage': 'Front Image',
+  'wizard.backImage': 'Back Image',
+  'wizard.generalImages': 'General Images (8 images)',
+  'wizard.generalView': 'General view',
+  'wizard.uploadFrontImage': 'Upload Front Image',
+  'wizard.uploadBackImage': 'Upload Back Image',
+  'wizard.facilitiesSelected': 'facilities selected',
+  'common.selected': 'selected',
+  'common.upload': 'Upload',
+
   // Admin Panel
   'admin.dashboard': 'Admin Dashboard',
   'admin.totalUsers': 'Total Users',

@@ -6,6 +6,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Property, LocalInfo, Template } from '../types';
 import { templates } from '../utils/data';
 import { supabase } from '../utils/supabase';
+import { authService } from '../utils/auth';
 
 // List of countries
 const countries = [

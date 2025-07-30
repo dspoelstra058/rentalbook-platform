@@ -530,307 +530,6 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
-  const renderProperties = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Management</h2>
-          <p className="text-gray-600">Manage all properties on the platform</p>
-        </div>
-        <button
-          onClick={() => setShowAddProperty(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Property
-        </button>
-      </div>
-
-      {/* Add Property Form */}
-      {showAddProperty && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Property</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Property Name *"
-              value={newProperty.name}
-              onChange={(e) => setNewProperty({...newProperty, name: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <select
-              value={newProperty.owner_id}
-              onChange={(e) => setNewProperty({...newProperty, owner_id: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Select Owner *</option>
-              {users.filter(user => user.role === 'owner').map(user => (
-                <option key={user.id} value={user.id}>{user.name} ({user.email})</option>
-              ))}
-            </select>
-            
-            <input
-              type="text"
-              placeholder="Address *"
-              value={newProperty.address}
-              onChange={(e) => setNewProperty({...newProperty, address: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            
-            <input
-              type="text"
-              placeholder="City *"
-              value={newProperty.city}
-              onChange={(e) => setNewProperty({...newProperty, city: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            
-            <select
-              value={newProperty.country}
-              onChange={(e) => setNewProperty({...newProperty, country: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Select Country *</option>
-              {countries.map(country => (
-                <option key={country} value={country}>{country}</option>
-              ))}
-            </select>
-            
-            <input
-              type="text"
-              placeholder="Website URL"
-              value={newProperty.website_url}
-              onChange={(e) => setNewProperty({...newProperty, website_url: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            
-            <textarea
-              placeholder="Description *"
-              value={newProperty.description}
-              onChange={(e) => setNewProperty({...newProperty, description: e.target.value})}
-              className="md:col-span-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
-              required
-            />
-          </div>
-          
-          <div className="flex items-center mt-4">
-            <input
-              type="checkbox"
-              id="is_published"
-              checked={newProperty.is_published}
-              onChange={(e) => setNewProperty({...newProperty, is_published: e.target.checked})}
-              className="mr-2"
-            />
-            <label htmlFor="is_published" className="text-sm text-gray-700">Published</label>
-          </div>
-          
-          {propertyFormError && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mt-4">
-              {propertyFormError}
-            </div>
-          )}
-          
-          <div className="flex justify-end space-x-2 mt-4">
-            <button
-              onClick={() => setShowAddProperty(false)}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={addProperty}
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                  Adding...
-                </>
-              ) : 'Add Property'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">All Properties</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Property
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Owner
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Location
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {properties.map((property) => (
-                <tr key={property.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{property.name}</div>
-                      <div className="text-sm text-gray-500">{property.description.substring(0, 50)}...</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{property.users?.name}</div>
-                    <div className="text-sm text-gray-500">{property.users?.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {property.city}, {property.country}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      property.is_published 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {property.is_published ? 'Published' : 'Draft'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      {property.website_url && (
-                        <a
-                          href={property.website_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </a>
-                      )}
-                      <button
-                        onClick={() => setEditingProperty(property.id)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteProperty(property.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
-  const addProperty = async () => {
-    setPropertyFormError(null);
-    setSuccessMessage(null);
-    
-    // Validate required fields
-    if (!newProperty.name || !newProperty.address || !newProperty.city || !newProperty.country || !newProperty.description || !newProperty.owner_id) {
-      setPropertyFormError('Please fill in all required fields');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .insert({
-          name: newProperty.name,
-          address: newProperty.address,
-          zip_code: newProperty.zip_code || null,
-          city: newProperty.city,
-          country: newProperty.country,
-          description: newProperty.description,
-          checkin_instructions: newProperty.checkin_instructions,
-          wifi_password: newProperty.wifi_password,
-          house_rules: newProperty.house_rules,
-          emergency_contacts: newProperty.emergency_contacts,
-          template_id: newProperty.template_id,
-          is_published: newProperty.is_published,
-          website_url: newProperty.website_url || null,
-          owner_id: newProperty.owner_id
-        });
-
-      if (error) throw error;
-
-      // Reload data
-      await loadData();
-      
-      // Reset form
-      setNewProperty({
-        name: '',
-        address: '',
-        city: '',
-        country: '',
-        description: '',
-        checkin_instructions: '',
-        wifi_password: '',
-        house_rules: '',
-        emergency_contacts: '',
-        template_id: 'modern-blue',
-        is_published: false,
-        website_url: '',
-        owner_id: ''
-      });
-      setShowAddProperty(false);
-      setSuccessMessage('Property added successfully');
-      
-      // Clear success message after 5 seconds
-      setTimeout(() => setSuccessMessage(null), 5000);
-    } catch (err) {
-      console.error('Error adding property:', err);
-      setPropertyFormError('Failed to add property: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const deleteProperty = async (propertyId: string) => {
-    if (!confirm('Are you sure you want to delete this property?')) {
-      return;
-    }
-
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('properties')
-        .delete()
-        .eq('id', propertyId);
-
-      if (error) throw error;
-
-      // Update local state
-      setProperties(properties.filter(property => property.id !== propertyId));
-    } catch (err) {
-      console.error('Error deleting property:', err);
-      setError('Failed to delete property: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -1057,7 +756,12 @@ export const AdminPanel: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
+                       <div className="text-sm text-gray-500">
+                         {property.address}
+                         {property.zip_code && `, ${property.zip_code}`}
+                         {property.city && `, ${property.city}`}
+                         {property.country && `, ${property.country}`}
+                       </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -1409,7 +1113,10 @@ export const AdminPanel: React.FC = () => {
                   </div>
                   <p className="text-sm text-gray-600 mt-1">{info.description}</p>
                   <div className="text-xs text-gray-500 mt-2">
-                    📍 {info.address}, {info.city}, {info.country}
+                    📍 {info.address}
+                    {info.zip_code && `, ${info.zip_code}`}
+                    {info.city && `, ${info.city}`}
+                    {info.country && `, ${info.country}`}
                     {info.phone && <span> • 📞 {info.phone}</span>}
                     {info.opening_hours && <span> • 🕒 {info.opening_hours}</span>}
                   </div>
@@ -1535,7 +1242,6 @@ export const AdminPanel: React.FC = () => {
           {[
             { id: 'dashboard', label: t('nav.dashboard'), icon: BarChart3 },
             { id: 'users', label: t('nav.users'), icon: Users },
-            { id: 'properties', label: 'Properties', icon: Home },
             { id: 'local-info', label: t('nav.localInfo'), icon: Database },
             { id: 'settings', label: t('nav.settings'), icon: Settings }
           ].map((tab) => {

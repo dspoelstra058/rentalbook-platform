@@ -7,6 +7,7 @@ import { Property, LocalInfo, Template } from '../types';
 import { templates } from '../utils/data';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
+import { useParams } from 'react-router-dom';
 
 // List of countries
 const countries = [
@@ -43,8 +44,13 @@ interface WizardStep {
   icon: React.ElementType;
 }
 
-export const PropertyWizard: React.FC = () => {
+interface PropertyWizardProps {
+  isEdit?: boolean;
+}
+
+export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }) => {
   const navigate = useNavigate();
+  const { id: propertyId } = useParams();
   const { t } = useLanguage();
   
   const steps: WizardStep[] = [
@@ -98,6 +104,50 @@ export const PropertyWizard: React.FC = () => {
   const [availableLocalInfo, setAvailableLocalInfo] = useState<LocalInfo[]>([]);
   const [loadingLocalInfo, setLoadingLocalInfo] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingProperty, setIsLoadingProperty] = useState(isEdit);
+
+  // Load existing property data if editing
+  useEffect(() => {
+    if (isEdit && propertyId) {
+      loadPropertyData();
+    }
+  }, [isEdit, propertyId]);
+
+  const loadPropertyData = async () => {
+    if (!propertyId) return;
+    
+    setIsLoadingProperty(true);
+    try {
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('id', propertyId)
+        .single();
+
+      if (error) throw error;
+
+      // Transform database data to form data
+      setFormData({
+        name: data.name || '',
+        address: data.address || '',
+        zipCode: data.zip_code || '',
+        city: data.city || '',
+        country: data.country || '',
+        description: data.description || '',
+        checkInInstructions: data.checkin_instructions || '',
+        wifiPassword: data.wifi_password || '',
+        houseRules: data.house_rules || '',
+        emergencyContacts: data.emergency_contacts || '',
+        templateId: data.template_id || 'modern-blue'
+      });
+    } catch (error) {
+      console.error('Error loading property:', error);
+      alert('Failed to load property data');
+      navigate('/dashboard');
+    } finally {
+      setIsLoadingProperty(false);
+    }
+  };
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -120,42 +170,73 @@ export const PropertyWizard: React.FC = () => {
         throw new Error('User not authenticated');
       }
 
-      // Create the property in Supabase
-      const { data, error } = await supabase
-        .from('properties')
-        .insert({
-          owner_id: user.id,
-          name: formData.name || '',
-          address: formData.address || '',
-          zip_code: formData.zipCode || null,
-          city: formData.city || '',
-          country: formData.country || '',
-          description: formData.description || '',
-          checkin_instructions: formData.checkInInstructions || '',
-          wifi_password: formData.wifiPassword || '',
-          house_rules: formData.houseRules || '',
-          emergency_contacts: formData.emergencyContacts || '',
-          template_id: formData.templateId || 'modern-blue',
-          is_published: true, // Assuming published after payment
-          website_url: null // Will be generated later
-        })
-        .select()
-        .single();
+      let data, error;
+
+      if (isEdit && propertyId) {
+        // Update existing property
+        const result = await supabase
+          .from('properties')
+          .update({
+            name: formData.name || '',
+            address: formData.address || '',
+            zip_code: formData.zipCode || null,
+            city: formData.city || '',
+            country: formData.country || '',
+            description: formData.description || '',
+            checkin_instructions: formData.checkInInstructions || '',
+            wifi_password: formData.wifiPassword || '',
+            house_rules: formData.houseRules || '',
+            emergency_contacts: formData.emergencyContacts || '',
+            template_id: formData.templateId || 'modern-blue',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', propertyId)
+          .select()
+          .single();
+        
+        data = result.data;
+        error = result.error;
+      } else {
+        // Create new property
+        const result = await supabase
+          .from('properties')
+          .insert({
+            owner_id: user.id,
+            name: formData.name || '',
+            address: formData.address || '',
+            zip_code: formData.zipCode || null,
+            city: formData.city || '',
+            country: formData.country || '',
+            description: formData.description || '',
+            checkin_instructions: formData.checkInInstructions || '',
+            wifi_password: formData.wifiPassword || '',
+            house_rules: formData.houseRules || '',
+            emergency_contacts: formData.emergencyContacts || '',
+            template_id: formData.templateId || 'modern-blue',
+            is_published: true, // Assuming published after payment
+            website_url: null // Will be generated later
+          })
+          .select()
+          .single();
+        
+        data = result.data;
+        error = result.error;
+      }
 
       if (error) {
-        console.error('Error creating property:', error);
+        console.error(`Error ${isEdit ? 'updating' : 'creating'} property:`, error);
         throw new Error(error.message);
       }
 
-      console.log('Property created successfully:', data);
+      console.log(`Property ${isEdit ? 'updated' : 'created'} successfully:`, data);
       
       // TODO: Save selected local info associations if needed
       // This would require a junction table between properties and local_info
       
       navigate('/dashboard');
     } catch (error) {
-      console.error('Failed to create property:', error);
-      alert('Failed to create property. Please try again.');
+      console.error(`Failed to ${isEdit ? 'update' : 'create'} property:`, error);
+      alert(`Failed to ${isEdit ? 'update' : 'create'} property. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -220,6 +301,16 @@ export const PropertyWizard: React.FC = () => {
 
     loadLocalInfo();
   }, [formData.city, formData.country]);
+
+  // Show loading spinner while loading property data
+  if (isLoadingProperty) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent"></div>
+        <span className="ml-2 text-gray-600">Loading property...</span>
+      </div>
+    );
+  }
 
   // Helper function to get category colors
   const getCategoryColor = (category: string) => {
@@ -623,7 +714,9 @@ export const PropertyWizard: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('wizard.createNewProperty')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          {isEdit ? 'Edit Property' : t('wizard.createNewProperty')}
+        </h1>
         <p className="text-gray-600">{t('wizard.followSteps')}</p>
       </div>
 
@@ -705,7 +798,7 @@ export const PropertyWizard: React.FC = () => {
               </>
             ) : (
               <>
-                {t('wizard.completePaymentBtn')}
+                {isEdit ? 'Save Changes' : t('wizard.completePaymentBtn')}
                 <CreditCard className="h-4 w-4 ml-1" />
               </>
             )}

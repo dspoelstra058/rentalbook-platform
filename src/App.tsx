@@ -63,7 +63,7 @@ const AppContent: React.FC = () => {
         <Route path="/properties/:id/edit" element={
           <ProtectedRoute>
             <Layout>
-              <PropertyWizard />
+              <PropertyWizard isEdit={true} />
             </Layout>
           </ProtectedRoute>
         } />

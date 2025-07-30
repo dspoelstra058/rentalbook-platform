@@ -1,10 +1,18 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Eye, Edit, Trash2, ExternalLink, Download, BarChart3 } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, ExternalLink, Download, BarChart3, Palette } from 'lucide-react';
 import { mockProperties } from '../utils/data';
+import { templates } from '../utils/data';
+import { PDFGenerator } from '../utils/pdfGenerator';
+import { TemplatePreview } from './TemplatePreview';
+import { useState } from 'react';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('modern-blue');
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const stats = [
     { label: 'Total Properties', value: '3', icon: BarChart3, color: 'blue' },
@@ -12,6 +20,36 @@ export const Dashboard: React.FC = () => {
     { label: 'Views This Month', value: '1,247', icon: ExternalLink, color: 'purple' },
     { label: 'PDF Downloads', value: '89', icon: Download, color: 'orange' }
   ];
+
+  const handleDownloadPDF = async (propertyId: string) => {
+    const property = mockProperties.find(p => p.id === propertyId);
+    if (!property) return;
+
+    setIsGeneratingPDF(true);
+    try {
+      const template = templates.find(t => t.id === property.templateId) || templates[0];
+      const pdfGenerator = new PDFGenerator(property, [], template);
+      await pdfGenerator.generatePDF();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  const handleChangeTemplate = (propertyId: string) => {
+    setSelectedProperty(propertyId);
+    setShowTemplateModal(true);
+  };
+
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    // Here you would typically update the property in your backend
+    console.log(`Updated property ${selectedProperty} with template ${templateId}`);
+    setShowTemplateModal(false);
+    setSelectedProperty(null);
+  };
 
   return (
     <div className="space-y-8">
@@ -91,10 +129,23 @@ export const Dashboard: React.FC = () => {
                     </a>
                   )}
                   <button
+                    onClick={() => handleDownloadPDF(property.id)}
+                    disabled={isGeneratingPDF}
                     className="p-2 text-gray-400 hover:text-green-600 transition-colors"
                     title="Download PDF"
                   >
-                    <Download className="h-4 w-4" />
+                    {isGeneratingPDF ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-green-600 border-t-transparent" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleChangeTemplate(property.id)}
+                    className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
+                    title="Change Template"
+                  >
+                    <Palette className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => navigate(`/properties/${property.id}/edit`)}
@@ -115,6 +166,46 @@ export const Dashboard: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Template Selection Modal */}
+      {showTemplateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Choose Template
+                </h3>
+                <button
+                  onClick={() => setShowTemplateModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {templates.map((template) => {
+                  const property = mockProperties.find(p => p.id === selectedProperty);
+                  return (
+                    <TemplatePreview
+                      key={template.id}
+                      template={template}
+                      property={property!}
+                      isSelected={selectedTemplate === template.id}
+                      onSelect={() => handleTemplateSelect(template.id)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

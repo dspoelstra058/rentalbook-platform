@@ -179,6 +179,18 @@ export default {
   'admin.addLocalInfoBtn': 'Lokale Info Toevoegen',
   'admin.fillRequiredFields': 'Vul alle verplichte velden in (Naam, Adres, Stad, Land, Beschrijving)',
   'admin.failedToAdd': 'Kon lokale informatie niet toevoegen',
+  'admin.import': 'Importeren',
+  'admin.importLocalInfo': 'Lokale Info Importeren',
+  'admin.importFromFile': 'Importeren uit Bestand',
+  'admin.selectFile': 'Selecteer CSV of Excel bestand',
+  'admin.downloadTemplate': 'Template Downloaden',
+  'admin.importInstructions': 'Upload een CSV of Excel bestand met lokale informatie. Verplichte kolommen: Naam, Adres, Stad, Land, Beschrijving',
+  'admin.importing': 'Importeren...',
+  'admin.importSuccess': '{count} items succesvol geïmporteerd',
+  'admin.importError': 'Import mislukt: {error}',
+  'admin.invalidFileFormat': 'Ongeldig bestandsformaat. Gebruik CSV of Excel bestanden.',
+  'admin.missingRequiredColumns': 'Ontbrekende verplichte kolommen: {columns}',
+  'admin.templateColumns': 'Naam,Categorie,Adres,Telefoon,Website,Beschrijving,Stad,Land,Beoordeling,Openingstijden,Geverifieerd',
 
   // Templates
   'templates.modernBlue': 'Modern Blauw',

@@ -179,6 +179,18 @@ export default {
   'admin.addLocalInfoBtn': '添加本地信息',
   'admin.fillRequiredFields': '请填写所有必填字段（名称、地址、城市、国家、描述）',
   'admin.failedToAdd': '添加本地信息失败',
+  'admin.import': '导入',
+  'admin.importLocalInfo': '导入本地信息',
+  'admin.importFromFile': '从文件导入',
+  'admin.selectFile': '选择CSV或Excel文件',
+  'admin.downloadTemplate': '下载模板',
+  'admin.importInstructions': '上传包含本地信息的CSV或Excel文件。必需列：名称、地址、城市、国家、描述',
+  'admin.importing': '导入中...',
+  'admin.importSuccess': '成功导入{count}项',
+  'admin.importError': '导入失败：{error}',
+  'admin.invalidFileFormat': '无效的文件格式。请使用CSV或Excel文件。',
+  'admin.missingRequiredColumns': '缺少必需列：{columns}',
+  'admin.templateColumns': '名称,类别,地址,电话,网站,描述,城市,国家,评分,营业时间,已验证',
 
   // Templates
   'templates.modernBlue': '现代蓝色',

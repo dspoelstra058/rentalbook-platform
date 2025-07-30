@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Users, Database, Settings, Plus, Edit, Trash2, Check, X, BarChart3 } from 'lucide-react';
+import { Users, Database, Settings, Plus, Edit, Trash2, Check, X, BarChart3, Upload, Download } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
+import * as XLSX from 'xlsx';
+import Papa from 'papaparse';
 
 // List of countries
 const countries = [
@@ -89,8 +91,10 @@ export const AdminPanel: React.FC = () => {
 
   // Form states
   const [showAddLocalInfo, setShowAddLocalInfo] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   const [newLocalInfo, setNewLocalInfo] = useState({
     name: '',
     category: 'restaurant' as const,
@@ -303,6 +307,100 @@ export const AdminPanel: React.FC = () => {
     } catch (err) {
       console.error('Error updating verification:', err);
       alert('Failed to update verification status');
+    }
+  };
+
+  const downloadTemplate = () => {
+    const headers = t('admin.templateColumns').split(',');
+    const csvContent = headers.join(',') + '\n';
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'local_info_template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    try {
+      let data: any[] = [];
+      
+      if (file.name.endsWith('.csv')) {
+        // Parse CSV
+        const text = await file.text();
+        const result = Papa.parse(text, { header: true, skipEmptyLines: true });
+        data = result.data as any[];
+      } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        // Parse Excel
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        data = XLSX.utils.sheet_to_json(worksheet);
+      } else {
+        throw new Error(t('admin.invalidFileFormat'));
+      }
+
+      // Validate required columns
+      const requiredColumns = ['Name', 'Address', 'City', 'Country', 'Description'];
+      const fileColumns = Object.keys(data[0] || {});
+      const missingColumns = requiredColumns.filter(col => !fileColumns.includes(col));
+      
+      if (missingColumns.length > 0) {
+        throw new Error(t('admin.missingRequiredColumns').replace('{columns}', missingColumns.join(', ')));
+      }
+
+      // Process and insert data
+      const insertPromises = data.map(async (row) => {
+        // Map columns to database fields
+        const localInfoData = {
+          name: row.Name || '',
+          category: (row.Category || 'restaurant').toLowerCase(),
+          address: row.Address || '',
+          phone: row.Phone || null,
+          website: row.Website || null,
+          description: row.Description || '',
+          city: row.City || '',
+          country: row.Country || '',
+          verified: row.Verified === 'true' || row.Verified === '1' || row.Verified === 1,
+          rating: row.Rating ? parseFloat(row.Rating) : null,
+          opening_hours: row['Opening Hours'] || null
+        };
+
+        // Validate required fields
+        if (!localInfoData.name || !localInfoData.address || !localInfoData.city || 
+            !localInfoData.country || !localInfoData.description) {
+          return null; // Skip invalid rows
+        }
+
+        return supabase.from('local_info').insert(localInfoData);
+      });
+
+      const results = await Promise.allSettled(insertPromises.filter(p => p !== null));
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+      
+      if (successCount > 0) {
+        alert(t('admin.importSuccess').replace('{count}', successCount.toString()));
+        await loadData(); // Reload data
+        setShowImportModal(false);
+      } else {
+        throw new Error('No valid rows found to import');
+      }
+
+    } catch (error) {
+      console.error('Import error:', error);
+      alert(t('admin.importError').replace('{error}', error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsImporting(false);
+      // Reset file input
+      event.target.value = '';
     }
   };
 
@@ -523,14 +621,82 @@ export const AdminPanel: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.localInfoManagement')}</h2>
           <p className="text-gray-600">Manage local information database</p>
         </div>
-        <button
-          onClick={() => setShowAddLocalInfo(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          {t('admin.addLocalInfo')}
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            {t('admin.import')}
+          </button>
+          <button
+            onClick={() => setShowAddLocalInfo(true)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {t('admin.addLocalInfo')}
+          </button>
+        </div>
       </div>
+
+      {/* Import Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('admin.importLocalInfo')}
+              </h3>
+              <button
+                onClick={() => setShowImportModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                {t('admin.importInstructions')}
+              </p>
+              
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <label className="cursor-pointer">
+                  <span className="text-blue-600 hover:text-blue-500 font-medium">
+                    {t('admin.selectFile')}
+                  </span>
+                  <input
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleFileImport}
+                    className="hidden"
+                    disabled={isImporting}
+                  />
+                </label>
+                <p className="text-xs text-gray-500 mt-2">CSV, XLSX, XLS</p>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={downloadTemplate}
+                  className="flex items-center text-sm text-blue-600 hover:text-blue-500"
+                >
+                  <Download className="h-4 w-4 mr-1" />
+                  {t('admin.downloadTemplate')}
+                </button>
+                
+                {isImporting && (
+                  <div className="flex items-center text-sm text-gray-600">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent mr-2" />
+                    {t('admin.importing')}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Local Info Form */}
       {showAddLocalInfo && (

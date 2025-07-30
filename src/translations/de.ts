@@ -179,6 +179,18 @@ export default {
   'admin.addLocalInfoBtn': 'Lokale Info Hinzufügen',
   'admin.fillRequiredFields': 'Bitte füllen Sie alle Pflichtfelder aus (Name, Adresse, Stadt, Land, Beschreibung)',
   'admin.failedToAdd': 'Lokale Informationen konnten nicht hinzugefügt werden',
+  'admin.import': 'Importieren',
+  'admin.importLocalInfo': 'Lokale Info Importieren',
+  'admin.importFromFile': 'Aus Datei Importieren',
+  'admin.selectFile': 'CSV oder Excel Datei auswählen',
+  'admin.downloadTemplate': 'Vorlage Herunterladen',
+  'admin.importInstructions': 'Laden Sie eine CSV oder Excel Datei mit lokalen Informationen hoch. Erforderliche Spalten: Name, Adresse, Stadt, Land, Beschreibung',
+  'admin.importing': 'Importieren...',
+  'admin.importSuccess': '{count} Elemente erfolgreich importiert',
+  'admin.importError': 'Import fehlgeschlagen: {error}',
+  'admin.invalidFileFormat': 'Ungültiges Dateiformat. Bitte verwenden Sie CSV oder Excel Dateien.',
+  'admin.missingRequiredColumns': 'Fehlende erforderliche Spalten: {columns}',
+  'admin.templateColumns': 'Name,Kategorie,Adresse,Telefon,Website,Beschreibung,Stadt,Land,Bewertung,Öffnungszeiten,Verifiziert',
 
   // Templates
   'templates.modernBlue': 'Modern Blau',

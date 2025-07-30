@@ -272,6 +272,13 @@ export default {
   'admin.updating': 'Actualizando...',
   'admin.updateLocalInfo': 'Actualizar Info Local',
   'admin.failedToUpdate': 'No se pudo actualizar la información local',
+  'admin.localInfoAdded': 'Información local agregada exitosamente',
+  'admin.localInfoUpdated': 'Información local actualizada exitosamente',
+  'admin.editLocalInfo': 'Editar Información Local',
+  'admin.deleteLocalInfo': 'Eliminar Información Local',
+  'admin.localInfoUpdated': 'Información local actualizada exitosamente',
+  'admin.editLocalInfo': 'Editar Información Local',
+  'admin.deleteLocalInfo': 'Eliminar Información Local',
 
   // Templates
   'templates.modernBlue': 'Azul Moderno',

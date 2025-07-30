@@ -272,6 +272,13 @@ export default {
   'admin.updating': 'Bijwerken...',
   'admin.updateLocalInfo': 'Lokale Info Bijwerken',
   'admin.failedToUpdate': 'Kon lokale informatie niet bijwerken',
+  'admin.localInfoAdded': 'Lokale informatie succesvol toegevoegd',
+  'admin.localInfoUpdated': 'Lokale informatie succesvol bijgewerkt',
+  'admin.editLocalInfo': 'Lokale Informatie Bewerken',
+  'admin.deleteLocalInfo': 'Lokale Informatie Verwijderen',
+  'admin.localInfoUpdated': 'Lokale informatie succesvol bijgewerkt',
+  'admin.editLocalInfo': 'Lokale Informatie Bewerken',
+  'admin.deleteLocalInfo': 'Lokale Informatie Verwijderen',
 
   // Templates
   'templates.modernBlue': 'Modern Blauw',

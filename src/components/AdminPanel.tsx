@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Plus, Edit, Trash2, Users, Database, Settings, Upload, Download, Check, X, BarChart3 } from 'lucide-react';
+import { 
+  Users, 
+  Database, 
+  Settings, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Upload, 
+  Download, 
+  Check, 
+  X,
+  BarChart3,
+  MapPin
+} from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { LocalInfo, User } from '../types';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
-import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
-// List of countries
+// List of countries for the dropdown
 const countries = [
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Argentina', 'Armenia', 'Australia',
   'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium',
@@ -35,149 +49,70 @@ const countries = [
   'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
 ];
 
-// Time options for opening hours
-const timeOptions = [
-  '00:00', '00:30', '01:00', '01:30', '02:00', '02:30', '03:00', '03:30',
-  '04:00', '04:30', '05:00', '05:30', '06:00', '06:30', '07:00', '07:30',
-  '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-  '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-  '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30',
-  '20:00', '20:30', '21:00', '21:30', '22:00', '22:30', '23:00', '23:30'
+const categories = [
+  'doctor', 'pharmacy', 'supermarket', 'restaurant', 'hospital', 'attraction', 'beach', 'activity'
 ];
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'owner' | 'admin';
-  created_at: string;
-  updated_at: string;
-}
-
-interface Property {
-  id: string;
-  owner_id: string;
-  name: string;
-  address: string;
-  city: string;
-  country: string;
-  description: string;
-  checkin_instructions: string;
-  wifi_password: string;
-  house_rules: string;
-  emergency_contacts: string;
-  template_id: string;
-  is_published: boolean;
-  website_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-interface LocalInfo {
-  id: string;
-  name: string;
-  category: string;
-  address: string;
-  phone?: string;
-  website?: string;
-  description: string;
-  city: string;
-  country: string;
-  verified: boolean;
-  rating?: number;
-  opening_hours?: string;
-  created_at: string;
-}
 
 export const AdminPanel: React.FC = () => {
   const location = useLocation();
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [users, setUsers] = useState<User[]>([]);
-  const [properties, setProperties] = useState<Property[]>([]);
   const [localInfo, setLocalInfo] = useState<LocalInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Form states
-  const [showAddLocalInfo, setShowAddLocalInfo] = useState(false);
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [showAddUser, setShowAddUser] = useState(false);
-  const [showAddProperty, setShowAddProperty] = useState(false);
-  const [editingProperty, setEditingProperty] = useState<string | null>(null);
-  const [editingUser, setEditingUser] = useState<string | null>(null);
-  const [editingLocalInfo, setEditingLocalInfo] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
-  const [userFormError, setUserFormError] = useState<string | null>(null);
-    console.log('Editing local info:', info);
-  const [localInfoFormError, setLocalInfoFormError] = useState<string | null>(null);
-  const [propertyFormError, setPropertyFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [editLocalInfoData, setEditLocalInfoData] = useState({
+
+  // Add local info form state
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
     name: '',
-    category: 'restaurant' as const,
+    category: 'restaurant' as LocalInfo['category'],
     address: '',
     phone: '',
     website: '',
     description: '',
     city: '',
     country: '',
-    verified: false,
     rating: '',
-    opening_hours: '',
+    openingHours: '',
     is24Hours: false,
     openTime: '09:00',
-    closeTime: '17:00'
+    closeTime: '17:00',
+    verified: false
   });
-  const [newUser, setNewUser] = useState({
+
+  // Edit state
+  const [editingItem, setEditingItem] = useState<LocalInfo | null>(null);
+  const [editFormData, setEditFormData] = useState(formData);
+
+  // User management state
+  const [showAddUserForm, setShowAddUserForm] = useState(false);
+  const [userFormData, setUserFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
     role: 'owner' as 'owner' | 'admin'
   });
-  const [newLocalInfo, setNewLocalInfo] = useState({
-    name: '',
-    category: 'restaurant' as const,
-    address: '',
-    phone: '',
-    website: '',
-    description: '',
-    city: '',
-    country: '',
-    verified: false,
-    rating: '',
-    opening_hours: '',
-    is24Hours: false,
-    openTime: '09:00',
-    closeTime: '17:00'
-  });
-  const [newProperty, setNewProperty] = useState({
-    name: '',
-    address: '',
-    city: '',
-    country: '',
-    description: '',
-    checkin_instructions: '',
-    wifi_password: '',
-    house_rules: '',
-    emergency_contacts: '',
-    template_id: 'modern-blue',
-    is_published: false,
-    website_url: '',
-    owner_id: ''
-  });
 
+  // Set active tab based on URL
   useEffect(() => {
-    // Set active tab based on URL
     const path = location.pathname;
-    if (path.includes('/users')) setActiveTab('users');
-    else if (path.includes('/properties')) setActiveTab('properties');
-    else if (path.includes('/local-info')) setActiveTab('local-info');
-    else if (path.includes('/settings')) setActiveTab('settings');
-    else setActiveTab('dashboard');
+    if (path.includes('/users')) {
+      setActiveTab('users');
+    } else if (path.includes('/local-info')) {
+      setActiveTab('local-info');
+    } else if (path.includes('/settings')) {
+      setActiveTab('settings');
+    } else {
+      setActiveTab('dashboard');
+    }
   }, [location]);
 
+  // Load data
   useEffect(() => {
     loadData();
   }, []);
@@ -194,29 +129,42 @@ export const AdminPanel: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (usersError) throw usersError;
-      setUsers(usersData || []);
 
-      // Load properties
-      const { data: propertiesData, error: propertiesError } = await supabase
-        .from('properties')
-        .select(`
-          *,
-          users!properties_owner_id_fkey(name, email)
-        `)
-        .order('created_at', { ascending: false });
+      const transformedUsers: User[] = (usersData || []).map(user => ({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role as 'owner' | 'admin',
+        createdAt: new Date(user.created_at)
+      }));
 
-      if (propertiesError) throw propertiesError;
-      setProperties(propertiesData || []);
+      setUsers(transformedUsers);
 
       // Load local info
       const { data: localInfoData, error: localInfoError } = await supabase
         .from('local_info')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('name');
 
       if (localInfoError) throw localInfoError;
-      setLocalInfo(localInfoData || []);
 
+      const transformedLocalInfo: LocalInfo[] = (localInfoData || []).map(item => ({
+        id: item.id,
+        name: item.name,
+        category: item.category as LocalInfo['category'],
+        address: item.address,
+        zipCode: item.zip_code || undefined,
+        phone: item.phone || undefined,
+        website: item.website || undefined,
+        description: item.description,
+        city: item.city,
+        country: item.country,
+        verified: item.verified,
+        rating: item.rating || undefined,
+        openingHours: item.opening_hours || undefined
+      }));
+
+      setLocalInfo(transformedLocalInfo);
     } catch (err) {
       console.error('Error loading data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -225,64 +173,216 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: 'owner' | 'admin') => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('users')
-        .update({ role: newRole, updated_at: new Date().toISOString() })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      // Update local state
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: newRole } : user
-      ));
-      setEditingUser(null);
-    } catch (err) {
-      console.error('Error updating user role:', err);
-      setError('Failed to update user role: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
-  };
-
-  const addUser = async () => {
-    setUserFormError(null);
-    setSuccessMessage(null);
-    
-    // Validate required fields
-    if (!newUser.name || !newUser.email || !newUser.password || !newUser.confirmPassword) {
-      setUserFormError(t('admin.fillAllFields'));
-      return;
-    }
-
-    // Check password match
-    if (newUser.password !== newUser.confirmPassword) {
-      setUserFormError(t('admin.passwordsNotMatch'));
+  const handleAddLocalInfo = async () => {
+    if (!formData.name || !formData.address || !formData.city || !formData.country || !formData.description) {
+      setError(t('admin.fillRequiredFields'));
       return;
     }
 
     setIsSubmitting(true);
-    try {
-      // Get the current session token
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('No active session');
-      }
+    setError(null);
 
-      // Call the Edge Function to create the user
+    try {
+      const openingHours = formData.is24Hours 
+        ? '24/7' 
+        : formData.openTime && formData.closeTime 
+          ? `${formData.openTime} - ${formData.closeTime}`
+          : null;
+
+      const { error } = await supabase
+        .from('local_info')
+        .insert({
+          name: formData.name,
+          category: formData.category,
+          address: formData.address,
+          phone: formData.phone || null,
+          website: formData.website || null,
+          description: formData.description,
+          city: formData.city,
+          country: formData.country,
+          rating: formData.rating ? parseFloat(formData.rating) : null,
+          opening_hours: openingHours,
+          verified: formData.verified
+        });
+
+      if (error) throw error;
+
+      // Reset form and reload data
+      setFormData({
+        name: '',
+        category: 'restaurant',
+        address: '',
+        phone: '',
+        website: '',
+        description: '',
+        city: '',
+        country: '',
+        rating: '',
+        openingHours: '',
+        is24Hours: false,
+        openTime: '09:00',
+        closeTime: '17:00',
+        verified: false
+      });
+      setShowAddForm(false);
+      await loadData();
+      setSuccessMessage(t('admin.localInfoAdded'));
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error adding local info:', err);
+      setError(t('admin.failedToAdd'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditLocalInfo = (info: LocalInfo) => {
+    setEditingItem(info);
+    
+    // Parse opening hours
+    let is24Hours = false;
+    let openTime = '09:00';
+    let closeTime = '17:00';
+    
+    if (info.openingHours) {
+      if (info.openingHours === '24/7' || info.openingHours.toLowerCase().includes('24')) {
+        is24Hours = true;
+      } else if (info.openingHours.includes(' - ')) {
+        const [open, close] = info.openingHours.split(' - ');
+        openTime = open.trim();
+        closeTime = close.trim();
+      }
+    }
+
+    setEditFormData({
+      name: info.name,
+      category: info.category,
+      address: info.address,
+      phone: info.phone || '',
+      website: info.website || '',
+      description: info.description,
+      city: info.city,
+      country: info.country,
+      rating: info.rating?.toString() || '',
+      openingHours: info.openingHours || '',
+      is24Hours,
+      openTime,
+      closeTime,
+      verified: info.verified
+    });
+  };
+
+  const handleUpdateLocalInfo = async () => {
+    if (!editFormData.name || !editFormData.address || !editFormData.city || !editFormData.country || !editFormData.description) {
+      setError(t('admin.fillRequiredFields'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const openingHours = editFormData.is24Hours 
+        ? '24/7' 
+        : editFormData.openTime && editFormData.closeTime 
+          ? `${editFormData.openTime} - ${editFormData.closeTime}`
+          : null;
+
+      const { error } = await supabase
+        .from('local_info')
+        .update({
+          name: editFormData.name,
+          category: editFormData.category,
+          address: editFormData.address,
+          phone: editFormData.phone || null,
+          website: editFormData.website || null,
+          description: editFormData.description,
+          city: editFormData.city,
+          country: editFormData.country,
+          rating: editFormData.rating ? parseFloat(editFormData.rating) : null,
+          opening_hours: openingHours,
+          verified: editFormData.verified,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingItem!.id);
+
+      if (error) throw error;
+
+      setEditingItem(null);
+      await loadData();
+      setSuccessMessage(t('admin.localInfoUpdated'));
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Error updating local info:', err);
+      setError(t('admin.failedToUpdate'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteLocalInfo = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this local information?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('local_info')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      await loadData();
+    } catch (err) {
+      console.error('Error deleting local info:', err);
+      setError('Failed to delete local information');
+    }
+  };
+
+  const toggleVerification = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('local_info')
+        .update({ 
+          verified: !currentStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+      await loadData();
+    } catch (err) {
+      console.error('Error updating verification:', err);
+      setError('Failed to update verification status');
+    }
+  };
+
+  const handleCreateUser = async () => {
+    if (!userFormData.name || !userFormData.email || !userFormData.password || !userFormData.confirmPassword) {
+      setError(t('admin.fillAllFields'));
+      return;
+    }
+
+    if (userFormData.password !== userFormData.confirmPassword) {
+      setError(t('admin.passwordsNotMatch'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
         },
         body: JSON.stringify({
-          email: newUser.email,
-          password: newUser.password,
-          name: newUser.name,
-          role: newUser.role
+          email: userFormData.email,
+          password: userFormData.password,
+          name: userFormData.name,
+          role: userFormData.role
         })
       });
 
@@ -292,294 +392,40 @@ export const AdminPanel: React.FC = () => {
         throw new Error(result.error || 'Failed to create user');
       }
 
-      // Reload data
-      await loadData();
-      
-      // Reset form
-      setNewUser({
+      // Reset form and reload data
+      setUserFormData({
         name: '',
         email: '',
         password: '',
         confirmPassword: '',
         role: 'owner'
       });
-      setShowAddUser(false);
+      setShowAddUserForm(false);
+      await loadData();
       setSuccessMessage(t('admin.userCreated'));
-      
-      // Clear success message after 5 seconds
-      setTimeout(() => setSuccessMessage(null), 5000);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
       console.error('Error creating user:', err);
-      setUserFormError(t('admin.failedToCreateUser') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
+      setError(err instanceof Error ? err.message : t('admin.failedToCreateUser'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const deleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This will also delete all their properties.')) {
-      return;
-    }
-
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      // Update local state
-      setUsers(users.filter(user => user.id !== userId));
-    } catch (err) {
-      console.error('Error deleting user:', err);
-      setError('Failed to delete user: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
-  };
-
-  const addLocalInfo = async () => {
-    setLocalInfoFormError(null);
-    setSuccessMessage(null);
-    
-    // Validate required fields
-    if (!newLocalInfo.name || !newLocalInfo.address || !newLocalInfo.city || !newLocalInfo.country || !newLocalInfo.description) {
-      setLocalInfoFormError(t('admin.fillRequiredFields'));
-      return;
-    }
-
+  const handleImport = async (file: File) => {
     setIsSubmitting(true);
-    try {
-      // Format opening hours
-      let openingHours = '';
-      if (newLocalInfo.is24Hours) {
-        openingHours = '24/7';
-      } else if (newLocalInfo.openTime && newLocalInfo.closeTime) {
-        openingHours = `${newLocalInfo.openTime} - ${newLocalInfo.closeTime}`;
-      }
+    setError(null);
 
-      const { error } = await supabase
-        .from('local_info')
-        .insert({
-          name: newLocalInfo.name,
-          category: newLocalInfo.category,
-          address: newLocalInfo.address,
-          phone: newLocalInfo.phone || null,
-          website: newLocalInfo.website || null,
-          description: newLocalInfo.description,
-          city: newLocalInfo.city,
-          country: newLocalInfo.country,
-          verified: newLocalInfo.verified,
-          rating: newLocalInfo.rating ? parseFloat(newLocalInfo.rating) : null,
-          opening_hours: openingHours || null
-        });
-
-      if (error) throw error;
-
-      // Reload data
-      await loadData();
-      
-      // Reset form
-      setNewLocalInfo({
-        name: '',
-        category: 'restaurant',
-        address: '',
-        phone: '',
-        website: '',
-        description: '',
-        city: '',
-        country: '',
-        verified: false,
-        rating: '',
-        opening_hours: '',
-        is24Hours: false,
-        openTime: '09:00',
-        closeTime: '17:00'
-      });
-      setShowAddLocalInfo(false);
-      setSuccessMessage('Local information added successfully');
-      
-      // Clear success message after 5 seconds
-      setTimeout(() => setSuccessMessage(null), 5000);
-    } catch (err) {
-      console.error('Error adding local info:', err);
-      setLocalInfoFormError(t('admin.failedToAdd') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const startEditLocalInfo = (info: LocalInfo) => {
-    setEditingLocalInfo(info.id);
-    setEditLocalInfoData({
-      name: info.name,
-      category: info.category as any,
-      address: info.address,
-      phone: info.phone || '',
-      website: info.website || '',
-      description: info.description,
-      city: info.city,
-      country: info.country,
-      verified: info.verified,
-      rating: info.rating ? info.rating.toString() : '',
-      opening_hours: info.opening_hours || '',
-      is24Hours: info.opening_hours === '24/7',
-      openTime: info.opening_hours && info.opening_hours !== '24/7' ? info.opening_hours.split(' - ')[0] || '09:00' : '09:00',
-      closeTime: info.opening_hours && info.opening_hours !== '24/7' ? info.opening_hours.split(' - ')[1] || '17:00' : '17:00'
-    });
-  };
-
-  const cancelEditLocalInfo = () => {
-    setEditingLocalInfo(null);
-    setLocalInfoFormError(null);
-    setEditLocalInfoData({
-      name: '',
-      category: 'restaurant',
-      address: '',
-      phone: '',
-      website: '',
-      description: '',
-      city: '',
-      country: '',
-      verified: false,
-      rating: '',
-      opening_hours: '',
-      is24Hours: false,
-      openTime: '09:00',
-      closeTime: '17:00'
-    });
-  };
-
-  const updateLocalInfo = async () => {
-    setLocalInfoFormError(null);
-    setSuccessMessage(null);
-    
-    // Validate required fields
-    if (!editLocalInfoData.name || !editLocalInfoData.address || !editLocalInfoData.city || !editLocalInfoData.country || !editLocalInfoData.description) {
-      setLocalInfoFormError(t('admin.fillRequiredFields'));
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      // Format opening hours
-      let openingHours = '';
-      if (editLocalInfoData.is24Hours) {
-        openingHours = '24/7';
-      } else if (editLocalInfoData.openTime && editLocalInfoData.closeTime) {
-        openingHours = `${editLocalInfoData.openTime} - ${editLocalInfoData.closeTime}`;
-      }
-
-      const { error } = await supabase
-        .from('local_info')
-        .update({
-          name: editLocalInfoData.name,
-          category: editLocalInfoData.category,
-          address: editLocalInfoData.address,
-          phone: editLocalInfoData.phone || null,
-          website: editLocalInfoData.website || null,
-          description: editLocalInfoData.description,
-          city: editLocalInfoData.city,
-          country: editLocalInfoData.country,
-          verified: editLocalInfoData.verified,
-          rating: editLocalInfoData.rating ? parseFloat(editLocalInfoData.rating) : null,
-          opening_hours: openingHours || null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', editingLocalInfo);
-
-      if (error) throw error;
-
-      // Reload data
-      await loadData();
-      
-      // Reset form
-      cancelEditLocalInfo();
-      setSuccessMessage('Local information updated successfully');
-      
-      // Clear success message after 5 seconds
-      setTimeout(() => setSuccessMessage(null), 5000);
-    } catch (err) {
-      console.error('Error updating local info:', err);
-      setLocalInfoFormError(t('admin.failedToUpdate') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const deleteLocalInfo = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this local information?')) {
-      return;
-    }
-
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('local_info')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      // Update local state
-      setLocalInfo(localInfo.filter(info => info.id !== id));
-    } catch (err) {
-      console.error('Error deleting local info:', err);
-      setError('Failed to delete local information: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
-  };
-
-  const toggleLocalInfoVerification = async (id: string, verified: boolean) => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('local_info')
-        .update({ verified: !verified, updated_at: new Date().toISOString() })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      // Update local state
-      setLocalInfo(localInfo.map(info => 
-        info.id === id ? { ...info, verified: !verified } : info
-      ));
-    } catch (err) {
-      console.error('Error updating verification:', err);
-      setError('Failed to update verification status: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
-  };
-
-  const downloadTemplate = () => {
-    const headers = t('admin.templateColumns').split(',');
-    const csvContent = headers.join(',') + '\n';
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'local_info_template.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsImporting(true);
     try {
       let data: any[] = [];
-      
+
       if (file.name.endsWith('.csv')) {
-        // Parse CSV
         const text = await file.text();
         const result = Papa.parse(text, { header: true, skipEmptyLines: true });
         data = result.data as any[];
       } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-        // Parse Excel
         const buffer = await file.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: 'buffer' });
+        const workbook = XLSX.read(buffer, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         data = XLSX.utils.sheet_to_json(worksheet);
@@ -589,773 +435,96 @@ export const AdminPanel: React.FC = () => {
 
       // Validate required columns
       const requiredColumns = ['Name', 'Address', 'City', 'Country', 'Description'];
-      const fileColumns = Object.keys(data[0] || {});
-      const missingColumns = requiredColumns.filter(col => !fileColumns.includes(col));
+      const columns = Object.keys(data[0] || {});
+      const missingColumns = requiredColumns.filter(col => !columns.includes(col));
       
       if (missingColumns.length > 0) {
         throw new Error(t('admin.missingRequiredColumns').replace('{columns}', missingColumns.join(', ')));
       }
 
       // Process and insert data
-      const insertPromises = data.map(async (row) => {
-        // Map columns to database fields
-        const localInfoData = {
-          name: row.Name || '',
-          category: (row.Category || 'restaurant').toLowerCase(),
-          address: row.Address || '',
-          phone: row.Phone || null,
-          website: row.Website || null,
-          description: row.Description || '',
-          city: row.City || '',
-          country: row.Country || '',
-          verified: row.Verified === 'true' || row.Verified === '1' || row.Verified === 1,
-          rating: row.Rating ? parseFloat(row.Rating) : null,
-          opening_hours: row['Opening Hours'] || null
-        };
+      const insertData = data.map(row => ({
+        name: row.Name,
+        category: categories.includes(row.Category?.toLowerCase()) ? row.Category.toLowerCase() : 'restaurant',
+        address: row.Address,
+        phone: row.Phone || null,
+        website: row.Website || null,
+        description: row.Description,
+        city: row.City,
+        country: row.Country,
+        rating: row.Rating ? parseFloat(row.Rating) : null,
+        opening_hours: row['Opening Hours'] || null,
+        verified: row.Verified === 'true' || row.Verified === true || false
+      }));
 
-        // Validate required fields
-        if (!localInfoData.name || !localInfoData.address || !localInfoData.city || 
-            !localInfoData.country || !localInfoData.description) {
-          return null; // Skip invalid rows
-        }
+      const { error } = await supabase
+        .from('local_info')
+        .insert(insertData);
 
-        return supabase.from('local_info').insert(localInfoData);
-      });
+      if (error) throw error;
 
-      const results = await Promise.allSettled(insertPromises.filter(p => p !== null));
-      const successCount = results.filter(r => r.status === 'fulfilled').length;
-      
-      if (successCount > 0) {
-        setSuccessMessage(t('admin.importSuccess').replace('{count}', successCount.toString()));
-        await loadData(); // Reload data
-        setShowImportModal(false);
-        
-        // Clear success message after 5 seconds
-        setTimeout(() => setSuccessMessage(null), 5000);
-      } else {
-        throw new Error('No valid rows found to import');
-      }
-
-    } catch (error) {
-      console.error('Import error:', error);
-      setError(t('admin.importError').replace('{error}', error instanceof Error ? error.message : 'Unknown error'));
+      setShowImportModal(false);
+      await loadData();
+      setSuccessMessage(t('admin.importSuccess').replace('{count}', data.length.toString()));
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      console.error('Import error:', err);
+      setError(t('admin.importError').replace('{error}', err instanceof Error ? err.message : 'Unknown error'));
     } finally {
-      setIsImporting(false);
-      // Reset file input
-      event.target.value = '';
+      setIsSubmitting(false);
     }
+  };
+
+  const downloadTemplate = () => {
+    const template = t('admin.templateColumns');
+    const blob = new Blob([template], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'local-info-template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      doctor: 'bg-red-100 text-red-800',
+      pharmacy: 'bg-green-100 text-green-800',
+      supermarket: 'bg-blue-100 text-blue-800',
+      restaurant: 'bg-orange-100 text-orange-800',
+      hospital: 'bg-red-100 text-red-800',
+      attraction: 'bg-purple-100 text-purple-800',
+      beach: 'bg-cyan-100 text-cyan-800',
+      activity: 'bg-yellow-100 text-yellow-800'
+    };
+    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent"></div>
-        <span className="ml-2 text-gray-600">Loading...</span>
+        <span className="ml-2 text-gray-600">{t('common.loading')}</span>
       </div>
     );
   }
-
-  if (error) {
-    return (
-      <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-        <p>Error loading admin data: {error}</p>
-        <button 
-          onClick={loadData}
-          className="mt-2 text-sm underline hover:no-underline"
-        >
-          Try again
-        </button>
-      </div>
-    );
-  }
-
-  const stats = [
-    { 
-      label: t('admin.totalUsers'), 
-      value: users.length.toString(), 
-      icon: Users, 
-      color: 'blue' 
-    },
-    { 
-      label: 'Total Properties', 
-      value: properties.length.toString(), 
-      icon: BarChart3, 
-      color: 'green' 
-    },
-    { 
-      label: 'Published Properties', 
-      value: properties.filter(p => p.is_published).length.toString(), 
-      icon: Check, 
-      color: 'purple' 
-    },
-    { 
-      label: t('admin.localListings'), 
-      value: localInfo.length.toString(), 
-      icon: Database, 
-      color: 'orange' 
-    }
-  ];
-
-  const renderDashboard = () => (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.dashboard')}</h2>
-        <p className="text-gray-600">Platform overview and statistics</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div key={stat.label} className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                </div>
-                <div className={`p-3 rounded-full bg-${stat.color}-100`}>
-                  <Icon className={`h-6 w-6 text-${stat.color}-600`} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Users</h3>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {users.slice(0, 5).map((user) => (
-            <div key={user.id} className="p-6 flex items-center justify-between">
-              <div>
-                <h4 className="font-medium text-gray-900">{user.name}</h4>
-                <p className="text-sm text-gray-600">{user.email}</p>
-                <p className="text-xs text-gray-500">
-                  Joined {new Date(user.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                user.role === 'admin' 
-                  ? 'bg-purple-100 text-purple-800' 
-                  : 'bg-blue-100 text-blue-800'
-              }`}>
-                {user.role}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderUsers = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.userManagement')}</h2>
-          <p className="text-gray-600">Manage platform users and their roles</p>
-        </div>
-        <button
-          onClick={() => setShowAddUser(true)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          {t('admin.addUser')}
-        </button>
-      </div>
-
-      {/* Add User Form */}
-      {showAddUser && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.addUserForm')}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder={`${t('admin.fullName')} *`}
-              value={newUser.name}
-              onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="email"
-              placeholder={`${t('admin.emailAddress')} *`}
-              value={newUser.email}
-              onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="password"
-              placeholder={`${t('admin.password')} *`}
-              value={newUser.password}
-              onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="password"
-              placeholder={`${t('admin.confirmPassword')} *`}
-              value={newUser.confirmPassword}
-              onChange={(e) => setNewUser({...newUser, confirmPassword: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <select
-              value={newUser.role}
-              onChange={(e) => setNewUser({...newUser, role: e.target.value as 'owner' | 'admin'})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="owner">{t('admin.owner')}</option>
-              <option value="admin">{t('admin.admin')}</option>
-            </select>
-          </div>
-          
-          <div className="flex justify-end space-x-2 mt-4">
-            <button
-              onClick={() => setShowAddUser(false)}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              {t('admin.cancel')}
-            </button>
-            <button
-              onClick={addUser}
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                  {t('admin.creating')}
-                </>
-              ) : t('admin.createUser')}
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="bg-white rounded-lg shadow-sm border">
-
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">{t('admin.allUsers')}</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Properties
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Joined
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => {
-                const userProperties = properties.filter(p => p.owner_id === user.id);
-                return (
-                  <tr key={user.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                       <div className="text-sm text-gray-500">
-                         {property.address}
-                         {property.zip_code && `, ${property.zip_code}`}
-                         {property.city && `, ${property.city}`}
-                         {property.country && `, ${property.country}`}
-                       </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {editingUser === user.id ? (
-                        <select
-                          value={user.role}
-                          onChange={(e) => updateUserRole(user.id, e.target.value as 'owner' | 'admin')}
-                          className="text-sm border border-gray-300 rounded px-2 py-1"
-                        >
-                          <option value="owner">Owner</option>
-                          <option value="admin">Admin</option>
-                        </select>
-                      ) : (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.role === 'admin' 
-                            ? 'bg-purple-100 text-purple-800' 
-                            : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {user.role}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {userProperties.length} {t('admin.properties')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
-                        {editingUser === user.id ? (
-                          <button
-                            onClick={() => setEditingUser(null)}
-                            className="text-gray-600 hover:text-gray-900"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => setEditingUser(user.id)}
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => deleteUser(user.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderLocalInfo = () => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.localInfoManagement')}</h2>
-          <p className="text-gray-600">Manage local information database</p>
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setShowImportModal(true)}
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            {t('admin.import')}
-          </button>
-          <button
-            onClick={() => setShowAddLocalInfo(true)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t('admin.addLocalInfo')}
-          </button>
-        </div>
-      </div>
-
-      {/* Import Modal */}
-      {showImportModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {t('admin.importLocalInfo')}
-              </h3>
-              <button
-                onClick={() => setShowImportModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                {t('admin.importInstructions')}
-              </p>
-              
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <label className="cursor-pointer">
-                  <span className="text-blue-600 hover:text-blue-500 font-medium">
-                    {t('admin.selectFile')}
-                  </span>
-                  <input
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    onChange={handleFileImport}
-                    className="hidden"
-                    disabled={isImporting}
-                  />
-                </label>
-                <p className="text-xs text-gray-500 mt-2">CSV, XLSX, XLS</p>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <button
-                  onClick={downloadTemplate}
-                  className="flex items-center text-sm text-blue-600 hover:text-blue-500"
-                >
-                  <Download className="h-4 w-4 mr-1" />
-                  {t('admin.downloadTemplate')}
-                </button>
-                
-                {isImporting && (
-                  <div className="flex items-center text-sm text-gray-600">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent mr-2" />
-                    {t('admin.importing')}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add Local Info Form */}
-      {showAddLocalInfo && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.addLocalInfoForm')}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder={`${t('admin.name')} *`}
-              value={newLocalInfo.name}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, name: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <select
-              value={newLocalInfo.category}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, category: e.target.value as any})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="restaurant">{t('categories.restaurant')}</option>
-              <option value="pharmacy">{t('categories.pharmacy')}</option>
-              <option value="supermarket">{t('categories.supermarket')}</option>
-              <option value="hospital">{t('categories.hospital')}</option>
-              <option value="doctor">{t('categories.doctor')}</option>
-              <option value="attraction">{t('categories.attraction')}</option>
-              <option value="beach">{t('categories.beach')}</option>
-              <option value="activity">{t('categories.activity')}</option>
-            </select>
-            
-            <input
-              type="text"
-              placeholder={`${t('admin.address')} *`}
-              value={newLocalInfo.address}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, address: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            
-            <input
-              type="text"
-              placeholder={t('admin.phone')}
-              value={newLocalInfo.phone}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, phone: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            
-            <input
-              type="text"
-              placeholder={t('admin.website')}
-              value={newLocalInfo.website}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, website: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            
-            <input
-              type="text"
-              placeholder={`${t('admin.city')} *`}
-              value={newLocalInfo.city}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, city: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            
-            <select
-              value={newLocalInfo.country}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, country: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">{t('admin.selectCountry')} *</option>
-              {countries.map(country => (
-                <option key={country} value={country}>{country}</option>
-              ))}
-            </select>
-            
-            <input
-              type="text"
-              placeholder={t('admin.rating')}
-              value={newLocalInfo.rating}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, rating: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="0"
-              max="5"
-              step="0.1"
-            />
-            
-            {/* Opening Hours Section */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.openingHours')}</label>
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="is24Hours"
-                    checked={newLocalInfo.is24Hours}
-                    onChange={(e) => setNewLocalInfo({...newLocalInfo, is24Hours: e.target.checked})}
-                    className="mr-2"
-                  />
-                  <label htmlFor="is24Hours" className="text-sm text-gray-700">{t('admin.open24Hours')}</label>
-                </div>
-                
-                {!newLocalInfo.is24Hours && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">{t('admin.openTime')}</label>
-                      <select
-                        value={newLocalInfo.openTime}
-                        onChange={(e) => setNewLocalInfo({...newLocalInfo, openTime: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {timeOptions.map(time => (
-                          <option key={time} value={time}>{time}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">{t('admin.closeTime')}</label>
-                      <select
-                        value={newLocalInfo.closeTime}
-                        onChange={(e) => setNewLocalInfo({...newLocalInfo, closeTime: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {timeOptions.map(time => (
-                          <option key={time} value={time}>{time}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <textarea
-              placeholder={`${t('admin.description')} *`}
-              value={newLocalInfo.description}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, description: e.target.value})}
-              className="md:col-span-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
-              required
-            />
-          </div>
-          
-          <div className="flex items-center mt-4">
-            <input
-              type="checkbox"
-              id="verified"
-              checked={newLocalInfo.verified}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, verified: e.target.checked})}
-              className="mr-2"
-            />
-            <label htmlFor="verified" className="text-sm text-gray-700">{t('admin.verified')}</label>
-          </div>
-          
-          {/* Local Info Form Error */}
-          {localInfoFormError && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mt-4">
-              {localInfoFormError}
-            </div>
-          )}
-          
-          <div className="flex justify-end space-x-2 mt-4">
-            <button
-              onClick={() => setShowAddLocalInfo(false)}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              {t('admin.cancel')}
-            </button>
-            <button
-              onClick={addLocalInfo}
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                  {t('admin.adding')}
-                </>
-              ) : t('admin.addLocalInfoBtn')}
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">{t('admin.allLocalInfo')}</h3>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {localInfo.map((info) => (
-            <div key={info.id} className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3">
-                    <h4 className="font-medium text-gray-900">{info.name}</h4>
-                    <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full capitalize">
-                      {info.category}
-                    </span>
-                    {info.verified ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <X className="h-4 w-4 text-red-500" />
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">{info.description}</p>
-                  <div className="text-xs text-gray-500 mt-2">
-                    📍 {info.address}
-                    {info.zip_code && `, ${info.zip_code}`}
-                    {info.city && `, ${info.city}`}
-                    {info.country && `, ${info.country}`}
-                    {info.phone && <span> • 📞 {info.phone}</span>}
-                    {info.opening_hours && <span> • 🕒 {info.opening_hours}</span>}
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => toggleLocalInfoVerification(info.id, info.verified)}
-                    className={`p-2 rounded ${
-                      info.verified 
-                        ? 'text-red-600 hover:text-red-800' 
-                        : 'text-green-600 hover:text-green-800'
-                    }`}
-                    title={info.verified ? 'Remove verification' : 'Mark as verified'}
-                  >
-                    {info.verified ? <X className="h-4 w-4" /> : <Check className="h-4 w-4" />}
-                  </button>
-                  <button
-                    onClick={() => startEditLocalInfo(info)}
-                    className="p-2 text-blue-600 hover:text-blue-800"
-                    title="Edit"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => deleteLocalInfo(info.id)}
-                    className="p-2 text-red-600 hover:text-red-800"
-                    title="Delete"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderSettings = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.platformSettings')}</h2>
-        <p className="text-gray-600">Configure platform settings and preferences</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.paymentSettings')}</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.basePrice')}
-              </label>
-              <input
-                type="number"
-                defaultValue="29.99"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.hostingFee')}
-              </label>
-              <input
-                type="number"
-                defaultValue="19.99"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.emailSettings')}</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.supportEmail')}
-              </label>
-              <input
-                type="email"
-                defaultValue="support@rentalbook.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
-    <div className="space-y-6">
-      {/* Global Success Message */}
-      {successMessage && (
-        <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md flex items-center justify-between">
-          <div className="flex items-center">
-            <Check className="h-5 w-5 mr-2" />
-            {successMessage}
-          </div>
-          <button
-            onClick={() => setSuccessMessage(null)}
-            className="text-green-400 hover:text-green-600"
-          >
-            <X className="h-4 w-4" />
-          </button>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">{t('admin.dashboard')}</h1>
+        <p className="text-gray-600">Platform administration and management</p>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+          {error}
         </div>
       )}
 
-      {/* Global Error Message */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md flex items-center justify-between">
-          <div className="flex items-center">
-            <X className="h-5 w-5 mr-2" />
-            {error}
-          </div>
-          <button
-            onClick={() => setError(null)}
-            className="text-red-400 hover:text-red-600"
-          >
-            <X className="h-4 w-4" />
-          </button>
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md">
+          {successMessage}
         </div>
       )}
 
@@ -1364,9 +533,9 @@ export const AdminPanel: React.FC = () => {
         <nav className="-mb-px flex space-x-8">
           {[
             { id: 'dashboard', label: t('nav.dashboard'), icon: BarChart3 },
-            { id: 'users', label: t('nav.users'), icon: Users },
-            { id: 'local-info', label: t('nav.localInfo'), icon: Database },
-            { id: 'settings', label: t('nav.settings'), icon: Settings }
+            { id: 'users', label: t('admin.userManagement'), icon: Users },
+            { id: 'local-info', label: t('admin.localInfoManagement'), icon: Database },
+            { id: 'settings', label: t('admin.platformSettings'), icon: Settings }
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -1387,12 +556,780 @@ export const AdminPanel: React.FC = () => {
         </nav>
       </div>
 
-      {/* Tab Content */}
-      {activeTab === 'dashboard' && renderDashboard()}
-      {activeTab === 'users' && renderUsers()}
-      {activeTab === 'properties' && renderProperties()}
-      {activeTab === 'local-info' && renderLocalInfo()}
-      {activeTab === 'settings' && renderSettings()}
+      {/* Dashboard Tab */}
+      {activeTab === 'dashboard' && (
+        <div className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{t('admin.totalUsers')}</p>
+                  <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+                </div>
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{t('admin.localListings')}</p>
+                  <p className="text-2xl font-bold text-gray-900">{localInfo.length}</p>
+                </div>
+                <Database className="h-8 w-8 text-green-600" />
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Properties</p>
+                  <p className="text-2xl font-bold text-gray-900">0</p>
+                </div>
+                <BarChart3 className="h-8 w-8 text-purple-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+            <div className="space-y-3">
+              <div className="flex items-center text-sm text-gray-600">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                <span>System initialized successfully</span>
+              </div>
+              <div className="flex items-center text-sm text-gray-600">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                <span>{users.length} users registered</span>
+              </div>
+              <div className="flex items-center text-sm text-gray-600">
+                <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                <span>{localInfo.length} local information entries</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Users Tab */}
+      {activeTab === 'users' && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-900">{t('admin.allUsers')}</h2>
+            <button
+              onClick={() => setShowAddUserForm(true)}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t('admin.addUser')}
+            </button>
+          </div>
+
+          {/* Add User Form */}
+          {showAddUserForm && (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.addUserForm')}</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.fullName')}
+                  </label>
+                  <input
+                    type="text"
+                    value={userFormData.name}
+                    onChange={(e) => setUserFormData({...userFormData, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.emailAddress')}
+                  </label>
+                  <input
+                    type="email"
+                    value={userFormData.email}
+                    onChange={(e) => setUserFormData({...userFormData, email: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.password')}
+                  </label>
+                  <input
+                    type="password"
+                    value={userFormData.password}
+                    onChange={(e) => setUserFormData({...userFormData, password: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.confirmPassword')}
+                  </label>
+                  <input
+                    type="password"
+                    value={userFormData.confirmPassword}
+                    onChange={(e) => setUserFormData({...userFormData, confirmPassword: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.userRole')}
+                  </label>
+                  <select
+                    value={userFormData.role}
+                    onChange={(e) => setUserFormData({...userFormData, role: e.target.value as 'owner' | 'admin'})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="owner">{t('admin.owner')}</option>
+                    <option value="admin">{t('admin.admin')}</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setShowAddUserForm(false)}
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  {t('admin.cancel')}
+                </button>
+                <button
+                  onClick={handleCreateUser}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? t('admin.creating') : t('admin.createUser')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Users List */}
+          <div className="bg-white rounded-lg shadow-sm border">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">{t('admin.allUsers')}</h3>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {users.map((user) => (
+                <div key={user.id} className="p-6 flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900">{user.name}</h4>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                    <p className="text-xs text-gray-500">
+                      {t('dashboard.created')} {user.createdAt.toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      user.role === 'admin' 
+                        ? 'bg-purple-100 text-purple-800' 
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {user.role === 'admin' ? t('admin.admin') : t('admin.owner')}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Local Info Tab */}
+      {activeTab === 'local-info' && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-900">{t('admin.allLocalInfo')}</h2>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowImportModal(true)}
+                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {t('admin.import')}
+              </button>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t('admin.addLocalInfo')}
+              </button>
+            </div>
+          </div>
+
+          {/* Add Local Info Form */}
+          {showAddForm && (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.addLocalInfoForm')}</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.name')} *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.category')}
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value as LocalInfo['category']})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{t(`categories.${cat}`)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.address')} *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.phone')}
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.website')}
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => setFormData({...formData, website: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.city')} *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.selectCountry')} *
+                  </label>
+                  <select
+                    value={formData.country}
+                    onChange={(e) => setFormData({...formData, country: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">{t('admin.selectCountry')}</option>
+                    {countries.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.rating')}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                    value={formData.rating}
+                    onChange={(e) => setFormData({...formData, rating: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.openingHours')}
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.is24Hours}
+                        onChange={(e) => setFormData({...formData, is24Hours: e.target.checked})}
+                        className="mr-2"
+                      />
+                      {t('admin.open24Hours')}
+                    </label>
+                    {!formData.is24Hours && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">{t('admin.openTime')}</label>
+                          <input
+                            type="time"
+                            value={formData.openTime}
+                            onChange={(e) => setFormData({...formData, openTime: e.target.value})}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">{t('admin.closeTime')}</label>
+                          <input
+                            type="time"
+                            value={formData.closeTime}
+                            onChange={(e) => setFormData({...formData, closeTime: e.target.value})}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.description')} *
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.verified}
+                      onChange={(e) => setFormData({...formData, verified: e.target.checked})}
+                      className="mr-2"
+                    />
+                    {t('admin.verified')}
+                  </label>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setShowAddForm(false)}
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  {t('admin.cancel')}
+                </button>
+                <button
+                  onClick={handleAddLocalInfo}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? t('admin.adding') : t('admin.addLocalInfoBtn')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Edit Local Info Form */}
+          {editingItem && (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.editLocalInfoForm')}</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.name')} *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.name}
+                    onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.category')}
+                  </label>
+                  <select
+                    value={editFormData.category}
+                    onChange={(e) => setEditFormData({...editFormData, category: e.target.value as LocalInfo['category']})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{t(`categories.${cat}`)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.address')} *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.address}
+                    onChange={(e) => setEditFormData({...editFormData, address: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.phone')}
+                  </label>
+                  <input
+                    type="tel"
+                    value={editFormData.phone}
+                    onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.website')}
+                  </label>
+                  <input
+                    type="url"
+                    value={editFormData.website}
+                    onChange={(e) => setEditFormData({...editFormData, website: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.city')} *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.city}
+                    onChange={(e) => setEditFormData({...editFormData, city: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.selectCountry')} *
+                  </label>
+                  <select
+                    value={editFormData.country}
+                    onChange={(e) => setEditFormData({...editFormData, country: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">{t('admin.selectCountry')}</option>
+                    {countries.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.rating')}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                    value={editFormData.rating}
+                    onChange={(e) => setEditFormData({...editFormData, rating: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.openingHours')}
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={editFormData.is24Hours}
+                        onChange={(e) => setEditFormData({...editFormData, is24Hours: e.target.checked})}
+                        className="mr-2"
+                      />
+                      {t('admin.open24Hours')}
+                    </label>
+                    {!editFormData.is24Hours && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">{t('admin.openTime')}</label>
+                          <input
+                            type="time"
+                            value={editFormData.openTime}
+                            onChange={(e) => setEditFormData({...editFormData, openTime: e.target.value})}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1">{t('admin.closeTime')}</label>
+                          <input
+                            type="time"
+                            value={editFormData.closeTime}
+                            onChange={(e) => setEditFormData({...editFormData, closeTime: e.target.value})}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.description')} *
+                  </label>
+                  <textarea
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={editFormData.verified}
+                      onChange={(e) => setEditFormData({...editFormData, verified: e.target.checked})}
+                      className="mr-2"
+                    />
+                    {t('admin.verified')}
+                  </label>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setEditingItem(null)}
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                >
+                  {t('admin.cancel')}
+                </button>
+                <button
+                  onClick={handleUpdateLocalInfo}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isSubmitting ? t('admin.updating') : t('admin.updateLocalInfo')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Import Modal */}
+          {showImportModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.importLocalInfo')}</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('admin.importFromFile')}
+                    </label>
+                    <input
+                      type="file"
+                      accept=".csv,.xlsx,.xls"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImport(file);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">{t('admin.selectFile')}</p>
+                  </div>
+                  <div>
+                    <button
+                      onClick={downloadTemplate}
+                      className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      {t('admin.downloadTemplate')}
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {t('admin.importInstructions')}
+                  </p>
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    onClick={() => setShowImportModal(false)}
+                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                  >
+                    {t('admin.cancel')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Local Info List */}
+          <div className="bg-white rounded-lg shadow-sm border">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">{t('admin.allLocalInfo')}</h3>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {localInfo.map((info) => (
+                <div key={info.id} className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h4 className="font-medium text-gray-900">{info.name}</h4>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full capitalize ${getCategoryColor(info.category)}`}>
+                          {t(`categories.${info.category}`)}
+                        </span>
+                        {info.verified && (
+                          <Check className="h-4 w-4 text-green-500" title={t('common.verified')} />
+                        )}
+                        {info.rating && (
+                          <div className="flex items-center">
+                            <span className="text-yellow-500">★</span>
+                            <span className="text-sm text-gray-600 ml-1">{info.rating}</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{info.description}</p>
+                      <div className="text-xs text-gray-500 space-y-1">
+                        <div className="flex items-center">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          {info.address}, {info.city}, {info.country}
+                        </div>
+                        {info.phone && (
+                          <div className="flex items-center">
+                            <span className="mr-1">📞</span>
+                            {info.phone}
+                          </div>
+                        )}
+                        {info.openingHours && (
+                          <div className="flex items-center">
+                            <span className="mr-1">🕒</span>
+                            {info.openingHours}
+                          </div>
+                        )}
+                        {info.website && (
+                          <div className="flex items-center">
+                            <span className="mr-1">🌐</span>
+                            <a href={info.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">
+                              {info.website}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => toggleVerification(info.id, info.verified)}
+                        className={`px-2 py-1 text-xs font-medium rounded ${
+                          info.verified 
+                            ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                        }`}
+                        title={info.verified ? t('common.verified') : t('common.unverified')}
+                      >
+                        {info.verified ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                      </button>
+                      <button
+                        onClick={() => handleEditLocalInfo(info)}
+                        className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                        title={t('admin.editLocalInfo')}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteLocalInfo(info.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        title={t('admin.deleteLocalInfo')}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Tab */}
+      {activeTab === 'settings' && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold text-gray-900">{t('admin.platformSettings')}</h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Payment Settings */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.paymentSettings')}</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.basePrice')}
+                  </label>
+                  <input
+                    type="number"
+                    defaultValue="29.99"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.hostingFee')}
+                  </label>
+                  <input
+                    type="number"
+                    defaultValue="19.99"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Email Settings */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.emailSettings')}</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('admin.supportEmail')}
+                  </label>
+                  <input
+                    type="email"
+                    defaultValue="support@rentalbook.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

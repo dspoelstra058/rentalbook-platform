@@ -272,6 +272,13 @@ export default {
   'admin.updating': '更新中...',
   'admin.updateLocalInfo': '更新本地信息',
   'admin.failedToUpdate': '更新本地信息失败',
+  'admin.localInfoAdded': '本地信息添加成功',
+  'admin.localInfoUpdated': '本地信息更新成功',
+  'admin.editLocalInfo': '编辑本地信息',
+  'admin.deleteLocalInfo': '删除本地信息',
+  'admin.localInfoUpdated': '本地信息更新成功',
+  'admin.editLocalInfo': '编辑本地信息',
+  'admin.deleteLocalInfo': '删除本地信息',
 
   // Templates
   'templates.modernBlue': '现代蓝色',

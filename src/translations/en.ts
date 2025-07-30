@@ -162,6 +162,8 @@ export default {
   'wizard.basicInfoDesc': 'Property details and location',
   'wizard.propertyContent': 'Property Content',
   'wizard.propertyContentDesc': 'Description and guest instructions',
+  'wizard.facilities': 'Property Facilities',
+  'wizard.facilitiesDesc': 'Amenities and features available',
   'wizard.localInfo': 'Local Information',
   'wizard.localInfoDesc': 'Nearby services and attractions',
   'wizard.chooseTemplate': 'Choose Template',

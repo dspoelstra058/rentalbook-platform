@@ -4,6 +4,7 @@ import { Save, ArrowLeft, Palette } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Property, LocalInfo } from '../types';
 import { templates } from '../utils/data';
+import { facilityCategories } from '../utils/facilities';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
 
@@ -51,7 +52,8 @@ export const PropertyEditPage: React.FC = () => {
     wifiPassword: '',
     houseRules: '',
     emergencyContacts: '',
-    templateId: 'modern-blue'
+    templateId: 'modern-blue',
+    facilities: []
   });
   
   const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +93,8 @@ export const PropertyEditPage: React.FC = () => {
         wifiPassword: data.wifi_password || '',
         houseRules: data.house_rules || '',
         emergencyContacts: data.emergency_contacts || '',
-        templateId: data.template_id || 'modern-blue'
+        templateId: data.template_id || 'modern-blue',
+        facilities: data.facilities || []
       });
     } catch (err) {
       console.error('Error loading property:', err);
@@ -127,6 +130,7 @@ export const PropertyEditPage: React.FC = () => {
           house_rules: formData.houseRules || '',
           emergency_contacts: formData.emergencyContacts || '',
           template_id: formData.templateId || 'modern-blue',
+          facilities: formData.facilities || [],
           updated_at: new Date().toISOString()
         })
         .eq('id', propertyId)
@@ -338,6 +342,54 @@ export const PropertyEditPage: React.FC = () => {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Facilities */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Property Facilities</h2>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {facilityCategories.map((category) => (
+                <div key={category.id} className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                    {category.name}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {category.facilities.map((facility) => (
+                      <label
+                        key={facility.id}
+                        className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.facilities?.includes(facility.id) || false}
+                          onChange={(e) => {
+                            const currentFacilities = formData.facilities || [];
+                            if (e.target.checked) {
+                              updateFormData({ facilities: [...currentFacilities, facility.id] });
+                            } else {
+                              updateFormData({ 
+                                facilities: currentFacilities.filter(id => id !== facility.id) 
+                              });
+                            }
+                          }}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="text-sm text-gray-700">{facility.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {formData.facilities && formData.facilities.length > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                <p className="text-sm text-blue-800">
+                  <strong>{formData.facilities.length}</strong> facilities selected
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Template Selection */}

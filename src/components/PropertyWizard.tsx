@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Check, MapPin, Home, FileText, Palette, Cred
 import { useLanguage } from '../contexts/LanguageContext';
 import { Property, LocalInfo, Template } from '../types';
 import { templates } from '../utils/data';
+import { facilityCategories } from '../utils/facilities';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
 import { useParams } from 'react-router-dom';
@@ -67,6 +68,12 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
       icon: FileText
     },
     {
+      id: 'facilities',
+      titleKey: 'wizard.facilities',
+      descriptionKey: 'wizard.facilitiesDesc',
+      icon: Home
+    },
+    {
       id: 'local',
       titleKey: 'wizard.localInfo',
       descriptionKey: 'wizard.localInfoDesc',
@@ -98,7 +105,8 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
     wifiPassword: '',
     houseRules: '',
     emergencyContacts: '',
-    templateId: ''
+    templateId: '',
+    facilities: []
   });
   const [selectedLocalInfo, setSelectedLocalInfo] = useState<string[]>([]);
   const [availableLocalInfo, setAvailableLocalInfo] = useState<LocalInfo[]>([]);
@@ -119,6 +127,8 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
     setIsLoadingProperty(true);
     try {
       const { data, error } = await supabase
+          facilities: formData.facilities || [],
+          facilities: formData.facilities || [],
         .from('properties')
         .select('*')
         .eq('id', propertyId)
@@ -138,7 +148,8 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
         wifiPassword: data.wifi_password || '',
         houseRules: data.house_rules || '',
         emergencyContacts: data.emergency_contacts || '',
-        templateId: data.template_id || 'modern-blue'
+        templateId: data.template_id || 'modern-blue',
+        facilities: data.facilities || []
       });
     } catch (error) {
       console.error('Error loading property:', error);
@@ -472,6 +483,59 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
                 placeholder={t('wizard.emergencyContactsPlaceholder')}
               />
             </div>
+          </div>
+        );
+
+      case 'facilities':
+        return (
+          <div className="space-y-6">
+            <div className="text-sm text-gray-600 mb-4">
+              Select the facilities and amenities available at your property:
+            </div>
+            
+            <div className="space-y-6 max-h-96 overflow-y-auto">
+              {facilityCategories.map((category) => (
+                <div key={category.id} className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                    {category.name}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {category.facilities.map((facility) => (
+                      <label
+                        key={facility.id}
+                        className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.facilities?.includes(facility.id) || false}
+                          onChange={(e) => {
+                            const currentFacilities = formData.facilities || [];
+                            if (e.target.checked) {
+                              updateFormData({ facilities: [...currentFacilities, facility.id] });
+                            } else {
+                              updateFormData({ 
+                                facilities: currentFacilities.filter(id => id !== facility.id) 
+                              });
+                            }
+                          }}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="text-sm text-gray-700">{facility.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {formData.facilities && formData.facilities.length > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>{formData.facilities.length}</strong> facilities selected
+                </p>
+              </div>
+            )}
           </div>
         );
 

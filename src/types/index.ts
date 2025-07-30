@@ -22,6 +22,7 @@ export interface Property {
   templateId: string;
   isPublished: boolean;
   websiteUrl?: string;
+  facilities?: string[];
   createdAt: Date;
   updatedAt: Date;
 }

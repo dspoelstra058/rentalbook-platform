@@ -447,11 +447,46 @@ export const PropertyEditPage: React.FC = () => {
                             }}
                             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                           />
+                  <div className="p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {category.facilities.map((facility) => (
+                        <label
+                          key={facility.id}
+                          className="flex items-center space-x-3 p-2 rounded-md hover:bg-blue-50 hover:border-blue-200 border border-transparent transition-all duration-200 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.facilities?.includes(facility.id) || false}
+                            onChange={(e) => {
+                              const currentFacilities = formData.facilities || [];
+                              if (e.target.checked) {
+                                updateFormData({ facilities: [...currentFacilities, facility.id] });
+                              } else {
+                                updateFormData({ 
+                                  facilities: currentFacilities.filter(f => f !== facility.id) 
+                                });
+                              }
+                            }}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
                           <span className="text-sm text-gray-700 flex-1">{facility.name}</span>
                         </label>
                       ))}
                     </div>
                   </div>
+                </div>
+              ))}
+            </div>
+            
+            {formData.facilities && formData.facilities.length > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>{formData.facilities.length}</strong> facilities selected
+                </p>
+              </div>
+            )}
+          </div>
+        );
                 </div>
               ))}
             </div>

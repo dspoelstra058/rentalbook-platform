@@ -6,6 +6,7 @@ import { LandingPage } from './components/LandingPage';
 import { AuthForm } from './components/AuthPages';
 import { Dashboard } from './components/Dashboard';
 import { PropertyWizard } from './components/PropertyWizard';
+import { PropertyEditPage } from './components/PropertyEditPage';
 import { AdminPanel } from './components/AdminPanel';
 import { PropertiesPage } from './components/PropertiesPage';
 import { SettingsPage } from './components/SettingsPage';
@@ -63,7 +64,7 @@ const AppContent: React.FC = () => {
         <Route path="/properties/:id/edit" element={
           <ProtectedRoute>
             <Layout>
-              <PropertyWizard isEdit={true} />
+              <PropertyEditPage />
             </Layout>
           </ProtectedRoute>
         } />

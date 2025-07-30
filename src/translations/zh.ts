@@ -207,6 +207,9 @@ export default {
   'wizard.completePaymentBtn': '完成支付',
   'wizard.processing': '处理中...',
 
+  // Property Edit Page
+  'wizard.updatePropertyInfo': '更新您的房产信息',
+
   // Admin Panel
   'admin.dashboard': '管理员仪表板',
   'admin.totalUsers': '总用户数',

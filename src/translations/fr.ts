@@ -207,6 +207,9 @@ export default {
   'wizard.completePaymentBtn': 'Finaliser le Paiement',
   'wizard.processing': 'Traitement...',
 
+  // Property Edit Page
+  'wizard.updatePropertyInfo': 'Mettez à jour les informations de votre propriété',
+
   // Admin Panel
   'admin.dashboard': 'Tableau de Bord Admin',
   'admin.totalUsers': 'Utilisateurs Totaux',

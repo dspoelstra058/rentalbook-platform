@@ -213,6 +213,7 @@ export default {
 
   // Property Edit Page
   'wizard.updatePropertyInfo': 'Update your property information',
+  'wizard.updatePropertyInfo': 'Update your property information',
   'wizard.frontImage': 'Front Image',
   'wizard.backImage': 'Back Image',
   'wizard.generalImages': 'General Images (8 images)',

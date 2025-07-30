@@ -207,6 +207,9 @@ export default {
   'wizard.completePaymentBtn': 'Betaling Voltooien',
   'wizard.processing': 'Verwerken...',
 
+  // Property Edit Page
+  'wizard.updatePropertyInfo': 'Werk uw accommodatie-informatie bij',
+
   // Admin Panel
   'admin.dashboard': 'Beheerderspaneel',
   'admin.totalUsers': 'Totaal Gebruikers',

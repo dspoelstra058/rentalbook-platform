@@ -511,11 +511,50 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
               Select the facilities and amenities available at your property:
             </div>
             
-            <div className="space-y-6 max-h-96 overflow-y-auto">
+            <div className="space-y-6 max-h-[500px] overflow-y-auto">
               {facilityCategories.map((category) => (
-                <div key={category.id} className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                <div key={category.id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                  <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-gray-900 flex items-center">
+                        <span className="w-3 h-3 bg-blue-500 rounded-full mr-3"></span>
+                        {category.name}
+                      </h3>
+                      <span className="text-sm text-gray-500">
+                        {formData.facilities?.filter(id => category.facilities.some(f => f.id === id)).length || 0} selected
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {category.facilities.map((facility) => (
+                        <label
+                          key={facility.id}
+                          className="flex items-center space-x-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors duration-200 border border-transparent hover:border-blue-200"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.facilities?.includes(facility.id) || false}
+                            onChange={(e) => {
+                              const currentFacilities = formData.facilities || [];
+                              if (e.target.checked) {
+                                updateFormData({ facilities: [...currentFacilities, facility.id] });
+                              } else {
+                                updateFormData({ 
+                                  facilities: currentFacilities.filter(id => id !== facility.id) 
+                                });
+                              }
+                            }}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <span className="text-sm text-gray-700 font-medium">{facility.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
                     {category.name}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -549,9 +588,17 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
             
             {formData.facilities && formData.facilities.length > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  <strong>{formData.facilities.length}</strong> facilities selected
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-blue-800">
+                    <strong>{formData.facilities.length}</strong> facilities selected
+                  </p>
+                  <button
+                    onClick={() => updateFormData({ facilities: [] })}
+                    className="text-sm text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Clear all
+                  </button>
+                </div>
               </div>
             )}
           </div>

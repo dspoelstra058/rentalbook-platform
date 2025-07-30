@@ -29,7 +29,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/admin/settings', label: t('nav.settings'), icon: Settings },
   ] : [
     { path: '/dashboard', label: t('nav.dashboard'), icon: Home },
-    { path: '/properties', label: t('nav.properties'), icon: Database },
+    { path: '/properties', label: t('nav.properties'), icon: Home },
     { path: '/settings', label: t('nav.settings'), icon: Settings },
   ];
 

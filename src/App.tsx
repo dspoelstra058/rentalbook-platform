@@ -69,7 +69,10 @@ const AppContent: React.FC = () => {
         <Route path="/properties" element={
           <ProtectedRoute>
             <Layout>
-              <Dashboard />
+              <div className="text-center py-12">
+                <h2 className="text-2xl font-bold text-gray-900">Properties</h2>
+                <p className="text-gray-600 mt-2">Property management coming soon...</p>
+              </div>
             </Layout>
           </ProtectedRoute>
         } />

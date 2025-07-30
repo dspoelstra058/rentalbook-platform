@@ -20,6 +20,7 @@ export const Dashboard: React.FC = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('modern-blue');
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [deletingPropertyId, setDeletingPropertyId] = useState<string | null>(null);
 
   useEffect(() => {
     loadProperties();
@@ -122,6 +123,35 @@ export const Dashboard: React.FC = () => {
     console.log(`Updated property ${selectedProperty} with template ${templateId}`);
     setShowTemplateModal(false);
     setSelectedProperty(null);
+  };
+
+  const handleDeleteProperty = async (propertyId: string) => {
+    if (!confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingPropertyId(propertyId);
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', propertyId);
+
+      if (error) {
+        console.error('Error deleting property:', error);
+        alert('Failed to delete property. Please try again.');
+        return;
+      }
+
+      // Remove the property from the local state
+      setProperties(prev => prev.filter(p => p.id !== propertyId));
+      console.log('Property deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete property:', error);
+      alert('Failed to delete property. Please try again.');
+    } finally {
+      setDeletingPropertyId(null);
+    }
   };
 
   if (loading) {
@@ -270,10 +300,16 @@ export const Dashboard: React.FC = () => {
                     <Edit className="h-4 w-4" />
                   </button>
                   <button
+                    onClick={() => handleDeleteProperty(property.id)}
+                    disabled={deletingPropertyId === property.id}
                     className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                     title={t('dashboard.deleteProperty')}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    {deletingPropertyId === property.id ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>

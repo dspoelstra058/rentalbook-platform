@@ -12,22 +12,26 @@ export const LandingPage: React.FC = () => {
     {
       icon: BookOpen,
       title: t('features.digitalBooks'),
-      description: t('features.digitalBooksDesc')
+      description: t('features.digitalBooksDesc'),
+      image: 'https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=400'
     },
     {
       icon: Globe,
       title: t('features.responsiveWebsites'),
-      description: t('features.responsiveWebsitesDesc')
+      description: t('features.responsiveWebsitesDesc'),
+      image: 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=400'
     },
     {
       icon: FileText,
       title: t('features.pdfExport'),
-      description: t('features.pdfExportDesc')
+      description: t('features.pdfExportDesc'),
+      image: 'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=400'
     },
     {
       icon: CreditCard,
       title: t('features.easyPayment'),
-      description: t('features.easyPaymentDesc')
+      description: t('features.easyPaymentDesc'),
+      image: 'https://images.pexels.com/photos/164527/pexels-photo-164527.jpeg?auto=compress&cs=tinysrgb&w=400'
     }
   ];
 
@@ -121,12 +125,22 @@ export const LandingPage: React.FC = () => {
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div key={feature.title} className="bg-white rounded-lg shadow-sm border p-6 text-center">
-                  <div className="bg-blue-100 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                    <Icon className="h-8 w-8 text-blue-600" />
+                <div key={feature.title} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={feature.image} 
+                      alt={feature.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
+                      <Icon className="h-6 w-6 text-blue-600" />
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                  </div>
                 </div>
               );
             })}

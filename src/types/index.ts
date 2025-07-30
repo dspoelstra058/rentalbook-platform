@@ -50,6 +50,62 @@ export interface Template {
     secondary: string;
     accent: string;
   };
+  pdfTemplate?: PDFTemplate;
+}
+
+export interface PDFTemplate {
+  id: string;
+  name: string;
+  layout: PDFLayout;
+  sections: PDFSection[];
+  styling: PDFStyling;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PDFLayout {
+  pageSize: 'a4' | 'letter';
+  orientation: 'portrait' | 'landscape';
+  margins: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  };
+  columns: number;
+}
+
+export interface PDFSection {
+  id: string;
+  type: 'header' | 'property-info' | 'checkin' | 'wifi' | 'rules' | 'local-info' | 'emergency' | 'footer' | 'custom';
+  title: string;
+  enabled: boolean;
+  order: number;
+  content: string;
+  styling: {
+    fontSize: number;
+    fontWeight: 'normal' | 'bold';
+    color: string;
+    backgroundColor?: string;
+    padding: number;
+    marginTop: number;
+    marginBottom: number;
+    borderLeft?: {
+      width: number;
+      color: string;
+    };
+  };
+}
+
+export interface PDFStyling {
+  fontFamily: string;
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string;
+  backgroundColor: string;
+  headerGradient: boolean;
+  roundedCorners: boolean;
+  shadows: boolean;
 }
 
 export interface Payment {

@@ -23,6 +23,11 @@ export interface Property {
   isPublished: boolean;
   websiteUrl?: string;
   facilities?: string[];
+  images?: {
+    front?: string;
+    general?: string[];
+    back?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

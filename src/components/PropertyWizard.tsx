@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Check, MapPin, Home, FileText, Palette, CreditCard } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, MapPin, Home, FileText, Palette, CreditCard, Image, Upload, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Property, LocalInfo, Template } from '../types';
 import { templates } from '../utils/data';
@@ -74,6 +74,12 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
       icon: Home
     },
     {
+      id: 'images',
+      titleKey: 'wizard.images',
+      descriptionKey: 'wizard.imagesDesc',
+      icon: Image
+    },
+    {
       id: 'local',
       titleKey: 'wizard.localInfo',
       descriptionKey: 'wizard.localInfoDesc',
@@ -106,7 +112,12 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
     houseRules: '',
     emergencyContacts: '',
     templateId: '',
-    facilities: []
+    facilities: [],
+    images: {
+      front: '',
+      general: [],
+      back: ''
+    }
   });
   const [selectedLocalInfo, setSelectedLocalInfo] = useState<string[]>([]);
   const [availableLocalInfo, setAvailableLocalInfo] = useState<LocalInfo[]>([]);
@@ -127,6 +138,7 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
     setIsLoadingProperty(true);
     try {
       const { data, error } = await supabase
+          images: formData.images || { front: '', general: [], back: '' },
         .from('properties')
         .select('*')
         .eq('id', propertyId)
@@ -147,7 +159,12 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
         houseRules: data.house_rules || '',
         emergencyContacts: data.emergency_contacts || '',
         templateId: data.template_id || 'modern-blue',
-        facilities: data.facilities || []
+        facilities: data.facilities || [],
+        images: data.images || {
+          front: '',
+          general: [],
+          back: ''
+        }
       });
     } catch (error) {
       console.error('Error loading property:', error);

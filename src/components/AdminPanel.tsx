@@ -5,6 +5,43 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
 
+// List of countries
+const countries = [
+  'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Argentina', 'Armenia', 'Australia',
+  'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium',
+  'Belize', 'Benin', 'Bhutan', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei',
+  'Bulgaria', 'Burkina Faso', 'Burundi', 'Cambodia', 'Cameroon', 'Canada', 'Cape Verde',
+  'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo', 'Costa Rica',
+  'Croatia', 'Cuba', 'Cyprus', 'Czech Republic', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic',
+  'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia', 'Ethiopia', 'Fiji',
+  'Finland', 'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada',
+  'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland',
+  'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan',
+  'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho',
+  'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi', 'Malaysia',
+  'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico', 'Micronesia',
+  'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar', 'Namibia',
+  'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Korea',
+  'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau', 'Panama', 'Papua New Guinea', 'Paraguay',
+  'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar', 'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis',
+  'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe',
+  'Saudi Arabia', 'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia',
+  'Solomon Islands', 'Somalia', 'South Africa', 'South Korea', 'South Sudan', 'Spain', 'Sri Lanka',
+  'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syria', 'Taiwan', 'Tajikistan', 'Tanzania', 'Thailand',
+  'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan', 'Tuvalu',
+  'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan',
+  'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
+];
+
+// Time options for opening hours
+const timeOptions = [
+  '00:00', '00:30', '01:00', '01:30', '02:00', '02:30', '03:00', '03:30',
+  '04:00', '04:30', '05:00', '05:30', '06:00', '06:30', '07:00', '07:30',
+  '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+  '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30',
+  '20:00', '20:30', '21:00', '21:30', '22:00', '22:30', '23:00', '23:30'
+];
 interface User {
   id: string;
   email: string;
@@ -53,6 +90,7 @@ export const AdminPanel: React.FC = () => {
   // Form states
   const [showAddLocalInfo, setShowAddLocalInfo] = useState(false);
   const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newLocalInfo, setNewLocalInfo] = useState({
     name: '',
     category: 'restaurant' as const,
@@ -64,7 +102,10 @@ export const AdminPanel: React.FC = () => {
     country: '',
     verified: false,
     rating: '',
-    opening_hours: ''
+    opening_hours: '',
+    is24Hours: false,
+    openTime: '09:00',
+    closeTime: '17:00'
   });
 
   useEffect(() => {
@@ -162,7 +203,22 @@ export const AdminPanel: React.FC = () => {
   };
 
   const addLocalInfo = async () => {
+    // Validate required fields
+    if (!newLocalInfo.name || !newLocalInfo.address || !newLocalInfo.city || !newLocalInfo.country || !newLocalInfo.description) {
+      alert('Please fill in all required fields (Name, Address, City, Country, Description)');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
+      // Format opening hours
+      let openingHours = '';
+      if (newLocalInfo.is24Hours) {
+        openingHours = '24/7';
+      } else if (newLocalInfo.openTime && newLocalInfo.closeTime) {
+        openingHours = `${newLocalInfo.openTime} - ${newLocalInfo.closeTime}`;
+      }
+
       const { error } = await supabase
         .from('local_info')
         .insert({
@@ -176,7 +232,7 @@ export const AdminPanel: React.FC = () => {
           country: newLocalInfo.country,
           verified: newLocalInfo.verified,
           rating: newLocalInfo.rating ? parseFloat(newLocalInfo.rating) : null,
-          opening_hours: newLocalInfo.opening_hours || null
+          opening_hours: openingHours || null
         });
 
       if (error) throw error;
@@ -196,12 +252,17 @@ export const AdminPanel: React.FC = () => {
         country: '',
         verified: false,
         rating: '',
-        opening_hours: ''
+        opening_hours: '',
+        is24Hours: false,
+        openTime: '09:00',
+        closeTime: '17:00'
       });
       setShowAddLocalInfo(false);
     } catch (err) {
       console.error('Error adding local info:', err);
       alert('Failed to add local information');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -475,18 +536,19 @@ export const AdminPanel: React.FC = () => {
       {showAddLocalInfo && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Local Information</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="text"
-              placeholder="Name"
+              placeholder="Name *"
               value={newLocalInfo.name}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, name: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
             <select
               value={newLocalInfo.category}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, category: e.target.value as any})}
-              className="px-3 py-2 border border-gray-300 rounded-md"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="restaurant">Restaurant</option>
               <option value="pharmacy">Pharmacy</option>
@@ -497,56 +559,120 @@ export const AdminPanel: React.FC = () => {
               <option value="beach">Beach</option>
               <option value="activity">Activity</option>
             </select>
+            
             <input
               type="text"
-              placeholder="Address"
+              placeholder="Address *"
               value={newLocalInfo.address}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, address: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
+            
             <input
               type="text"
               placeholder="Phone"
               value={newLocalInfo.phone}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, phone: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            
             <input
               type="text"
               placeholder="Website"
               value={newLocalInfo.website}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, website: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            
             <input
               type="text"
-              placeholder="City"
+              placeholder="City *"
               value={newLocalInfo.city}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, city: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
-            <input
-              type="text"
-              placeholder="Country"
+            
+            <select
               value={newLocalInfo.country}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, country: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md"
-            />
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Select Country *</option>
+              {countries.map(country => (
+                <option key={country} value={country}>{country}</option>
+              ))}
+            </select>
+            
             <input
               type="text"
-              placeholder="Opening Hours"
-              value={newLocalInfo.opening_hours}
-              onChange={(e) => setNewLocalInfo({...newLocalInfo, opening_hours: e.target.value})}
-              className="px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="Rating (0-5)"
+              value={newLocalInfo.rating}
+              onChange={(e) => setNewLocalInfo({...newLocalInfo, rating: e.target.value})}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              min="0"
+              max="5"
+              step="0.1"
             />
+            
+            {/* Opening Hours Section */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Opening Hours</label>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="is24Hours"
+                    checked={newLocalInfo.is24Hours}
+                    onChange={(e) => setNewLocalInfo({...newLocalInfo, is24Hours: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <label htmlFor="is24Hours" className="text-sm text-gray-700">Open 24 hours</label>
+                </div>
+                
+                {!newLocalInfo.is24Hours && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Open Time</label>
+                      <select
+                        value={newLocalInfo.openTime}
+                        onChange={(e) => setNewLocalInfo({...newLocalInfo, openTime: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {timeOptions.map(time => (
+                          <option key={time} value={time}>{time}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Close Time</label>
+                      <select
+                        value={newLocalInfo.closeTime}
+                        onChange={(e) => setNewLocalInfo({...newLocalInfo, closeTime: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {timeOptions.map(time => (
+                          <option key={time} value={time}>{time}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
             <textarea
-              placeholder="Description"
+              placeholder="Description *"
               value={newLocalInfo.description}
               onChange={(e) => setNewLocalInfo({...newLocalInfo, description: e.target.value})}
-              className="col-span-2 px-3 py-2 border border-gray-300 rounded-md"
+              className="md:col-span-2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={3}
+              required
             />
           </div>
+          
           <div className="flex items-center mt-4">
             <input
               type="checkbox"
@@ -557,6 +683,7 @@ export const AdminPanel: React.FC = () => {
             />
             <label htmlFor="verified" className="text-sm text-gray-700">Verified</label>
           </div>
+          
           <div className="flex justify-end space-x-2 mt-4">
             <button
               onClick={() => setShowAddLocalInfo(false)}
@@ -566,9 +693,15 @@ export const AdminPanel: React.FC = () => {
             </button>
             <button
               onClick={addLocalInfo}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
-              Add
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                  Adding...
+                </>
+              ) : 'Add Local Info'}
             </button>
           </div>
         </div>

@@ -37,99 +37,101 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<AuthForm type="login" />} />
-        <Route path="/register" element={<AuthForm type="register" />} />
-        
-        {/* Protected User Routes */}
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/properties/new" element={
-          <ProtectedRoute>
-            <Layout>
-              <PropertyWizard />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/properties/:id/edit" element={
-          <ProtectedRoute>
-            <Layout>
-              <PropertyEditPage />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/properties" element={
-          <ProtectedRoute>
-            <Layout>
-              <PropertiesPage />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/settings" element={
-          <ProtectedRoute>
-            <Layout>
-              <SettingsPage />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        {/* Protected Admin Routes */}
-        <Route path="/admin" element={
-          <ProtectedRoute adminOnly>
-            <Layout>
-              <AdminPanel />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/admin/users" element={
-          <ProtectedRoute adminOnly>
-            <Layout>
-              <AdminPanel />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/admin/properties" element={
-          <ProtectedRoute adminOnly>
-            <Layout>
-              <AdminPanel />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/admin/local-info" element={
-          <ProtectedRoute adminOnly>
-            <Layout>
-              <AdminPanel />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/admin/settings" element={
-          <ProtectedRoute adminOnly>
-            <Layout>
-              <AdminPanel />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        
-        {/* Redirect fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+    <LanguageProvider>
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<AuthForm type="login" />} />
+          <Route path="/register" element={<AuthForm type="register" />} />
+          
+          {/* Protected User Routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/properties/new" element={
+            <ProtectedRoute>
+              <Layout>
+                <PropertyWizard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/properties/:id/edit" element={
+            <ProtectedRoute>
+              <Layout>
+                <PropertyEditPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/properties" element={
+            <ProtectedRoute>
+              <Layout>
+                <PropertiesPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <Layout>
+                <SettingsPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Protected Admin Routes */}
+          <Route path="/admin" element={
+            <ProtectedRoute adminOnly>
+              <Layout>
+                <AdminPanel />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin/users" element={
+            <ProtectedRoute adminOnly>
+              <Layout>
+                <AdminPanel />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin/properties" element={
+            <ProtectedRoute adminOnly>
+              <Layout>
+                <AdminPanel />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin/local-info" element={
+            <ProtectedRoute adminOnly>
+              <Layout>
+                <AdminPanel />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin/settings" element={
+            <ProtectedRoute adminOnly>
+              <Layout>
+                <AdminPanel />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Redirect fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </LanguageProvider>
   );
 };
 
@@ -152,9 +154,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean 
 
 function App() {
   return (
-    <LanguageProvider>
-      <AppContent />
-    </LanguageProvider>
+    <AppContent />
   );
 }
 

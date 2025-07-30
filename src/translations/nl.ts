@@ -39,7 +39,7 @@ export default {
   'nav.admin': 'Beheerder',
 
   // Landing Page
-  'landing.title': 'Maak prachtige informatieboeken voor je gasten',
+  'landing.title': 'Maak prachtige informatieboeken <br>voor je gasten',
   'landing.subtitle': 'Bied een volledige verzorgde vakantie ervaring met professionele digitale informatieboeken. Genereer websites en PDF\'s met lokale informatie, huisregels en alles wat je gasten moeten weten.',
   'landing.startFreeTrial': 'Start gratis proefperiode',
   'landing.viewDemo': 'Bekijk Demo',

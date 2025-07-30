@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Users, Database, Settings, Plus, Edit, Trash2, Check, X, BarChart3, Upload, Download, Home, Eye, Globe } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, Database, Settings, Upload, Download, Check, X, BarChart3 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';

@@ -102,6 +102,14 @@ const AppContent: React.FC = () => {
           </ProtectedRoute>
         } />
         
+        <Route path="/admin/properties" element={
+          <ProtectedRoute adminOnly>
+            <Layout>
+              <AdminPanel />
+            </Layout>
+          </ProtectedRoute>
+        } />
+        
         <Route path="/admin/local-info" element={
           <ProtectedRoute adminOnly>
             <Layout>

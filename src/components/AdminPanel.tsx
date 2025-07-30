@@ -298,121 +298,6 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
-  const addProperty = async () => {
-    setPropertyFormError(null);
-    setSuccessMessage(null);
-    
-    // Validate required fields
-    if (!newProperty.name || !newProperty.address || !newProperty.city || !newProperty.country || !newProperty.owner_id) {
-      setPropertyFormError('Please fill in all required fields (Name, Address, City, Country, Owner)');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .insert({
-          name: newProperty.name,
-          address: newProperty.address,
-          city: newProperty.city,
-          country: newProperty.country,
-          description: newProperty.description,
-          checkin_instructions: newProperty.checkin_instructions,
-          wifi_password: newProperty.wifi_password,
-          house_rules: newProperty.house_rules,
-          emergency_contacts: newProperty.emergency_contacts,
-          template_id: newProperty.template_id,
-          is_published: newProperty.is_published,
-          website_url: newProperty.website_url || null,
-          owner_id: newProperty.owner_id
-        });
-
-      if (error) throw error;
-
-      // Reload data
-      await loadData();
-      
-      // Reset form
-      setNewProperty({
-        name: '',
-        address: '',
-        city: '',
-        country: '',
-        description: '',
-        checkin_instructions: '',
-        wifi_password: '',
-        house_rules: '',
-        emergency_contacts: '',
-        template_id: 'modern-blue',
-        is_published: false,
-        website_url: '',
-        owner_id: ''
-      });
-      setShowAddProperty(false);
-      setSuccessMessage('Property created successfully');
-      
-      // Clear success message after 5 seconds
-      setTimeout(() => setSuccessMessage(null), 5000);
-    } catch (err) {
-      console.error('Error creating property:', err);
-      setPropertyFormError('Failed to create property: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const updateProperty = async (propertyId: string, updates: Partial<Property>) => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('properties')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', propertyId);
-
-      if (error) throw error;
-
-      // Update local state
-      setProperties(properties.map(property => 
-        property.id === propertyId ? { ...property, ...updates } : property
-      ));
-      setEditingProperty(null);
-      setSuccessMessage('Property updated successfully');
-      setTimeout(() => setSuccessMessage(null), 5000);
-    } catch (err) {
-      console.error('Error updating property:', err);
-      setError('Failed to update property: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
-  };
-
-  const deleteProperty = async (propertyId: string) => {
-    if (!confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('properties')
-        .delete()
-        .eq('id', propertyId);
-
-      if (error) throw error;
-
-      // Update local state
-      setProperties(properties.filter(property => property.id !== propertyId));
-      setSuccessMessage('Property deleted successfully');
-      setTimeout(() => setSuccessMessage(null), 5000);
-    } catch (err) {
-      console.error('Error deleting property:', err);
-      setError('Failed to delete property: ' + (err instanceof Error ? err.message : 'Unknown error'));
-    }
-  };
-
-  const togglePropertyPublished = async (propertyId: string, isPublished: boolean) => {
-    await updateProperty(propertyId, { is_published: !isPublished });
-  };
-
   const deleteUser = async (userId: string) => {
     if (!confirm('Are you sure you want to delete this user? This will also delete all their properties.')) {
       return;
@@ -1374,6 +1259,7 @@ export const AdminPanel: React.FC = () => {
       {/* Tab Content */}
       {activeTab === 'dashboard' && renderDashboard()}
       {activeTab === 'users' && renderUsers()}
+      {activeTab === 'properties' && renderProperties()}
       {activeTab === 'local-info' && renderLocalInfo()}
       {activeTab === 'settings' && renderSettings()}
     </div>

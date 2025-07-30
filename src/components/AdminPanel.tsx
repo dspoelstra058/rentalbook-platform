@@ -96,6 +96,9 @@ export const AdminPanel: React.FC = () => {
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [userFormError, setUserFormError] = useState<string | null>(null);
+  const [localInfoFormError, setLocalInfoFormError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
@@ -175,6 +178,7 @@ export const AdminPanel: React.FC = () => {
 
   const updateUserRole = async (userId: string, newRole: 'owner' | 'admin') => {
     try {
+      setError(null);
       const { error } = await supabase
         .from('users')
         .update({ role: newRole, updated_at: new Date().toISOString() })
@@ -189,20 +193,23 @@ export const AdminPanel: React.FC = () => {
       setEditingUser(null);
     } catch (err) {
       console.error('Error updating user role:', err);
-      alert('Failed to update user role');
+      setError('Failed to update user role: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
 
   const addUser = async () => {
+    setUserFormError(null);
+    setSuccessMessage(null);
+    
     // Validate required fields
     if (!newUser.name || !newUser.email || !newUser.password || !newUser.confirmPassword) {
-      alert(t('admin.fillAllFields'));
+      setUserFormError(t('admin.fillAllFields'));
       return;
     }
 
     // Check password match
     if (newUser.password !== newUser.confirmPassword) {
-      alert(t('admin.passwordsNotMatch'));
+      setUserFormError(t('admin.passwordsNotMatch'));
       return;
     }
 
@@ -248,10 +255,13 @@ export const AdminPanel: React.FC = () => {
         role: 'owner'
       });
       setShowAddUser(false);
-      alert(t('admin.userCreated'));
+      setSuccessMessage(t('admin.userCreated'));
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err) {
       console.error('Error creating user:', err);
-      alert(t('admin.failedToCreateUser') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
+      setUserFormError(t('admin.failedToCreateUser') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -263,6 +273,7 @@ export const AdminPanel: React.FC = () => {
     }
 
     try {
+      setError(null);
       const { error } = await supabase
         .from('users')
         .delete()
@@ -274,14 +285,17 @@ export const AdminPanel: React.FC = () => {
       setUsers(users.filter(user => user.id !== userId));
     } catch (err) {
       console.error('Error deleting user:', err);
-      alert('Failed to delete user');
+      setError('Failed to delete user: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
 
   const addLocalInfo = async () => {
+    setLocalInfoFormError(null);
+    setSuccessMessage(null);
+    
     // Validate required fields
     if (!newLocalInfo.name || !newLocalInfo.address || !newLocalInfo.city || !newLocalInfo.country || !newLocalInfo.description) {
-      alert(t('admin.fillRequiredFields'));
+      setLocalInfoFormError(t('admin.fillRequiredFields'));
       return;
     }
 
@@ -334,9 +348,13 @@ export const AdminPanel: React.FC = () => {
         closeTime: '17:00'
       });
       setShowAddLocalInfo(false);
+      setSuccessMessage('Local information added successfully');
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err) {
       console.error('Error adding local info:', err);
-      alert(t('admin.failedToAdd'));
+      setLocalInfoFormError(t('admin.failedToAdd') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -348,6 +366,7 @@ export const AdminPanel: React.FC = () => {
     }
 
     try {
+      setError(null);
       const { error } = await supabase
         .from('local_info')
         .delete()
@@ -359,12 +378,13 @@ export const AdminPanel: React.FC = () => {
       setLocalInfo(localInfo.filter(info => info.id !== id));
     } catch (err) {
       console.error('Error deleting local info:', err);
-      alert('Failed to delete local information');
+      setError('Failed to delete local information: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
 
   const toggleLocalInfoVerification = async (id: string, verified: boolean) => {
     try {
+      setError(null);
       const { error } = await supabase
         .from('local_info')
         .update({ verified: !verified, updated_at: new Date().toISOString() })
@@ -378,7 +398,7 @@ export const AdminPanel: React.FC = () => {
       ));
     } catch (err) {
       console.error('Error updating verification:', err);
-      alert('Failed to update verification status');
+      setError('Failed to update verification status: ' + (err instanceof Error ? err.message : 'Unknown error'));
     }
   };
 
@@ -459,16 +479,19 @@ export const AdminPanel: React.FC = () => {
       const successCount = results.filter(r => r.status === 'fulfilled').length;
       
       if (successCount > 0) {
-        alert(t('admin.importSuccess').replace('{count}', successCount.toString()));
+        setSuccessMessage(t('admin.importSuccess').replace('{count}', successCount.toString()));
         await loadData(); // Reload data
         setShowImportModal(false);
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setSuccessMessage(null), 5000);
       } else {
         throw new Error('No valid rows found to import');
       }
 
     } catch (error) {
       console.error('Import error:', error);
-      alert(t('admin.importError').replace('{error}', error instanceof Error ? error.message : 'Unknown error'));
+      setError(t('admin.importError').replace('{error}', error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setIsImporting(false);
       // Reset file input
@@ -1135,6 +1158,38 @@ export const AdminPanel: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Global Success Message */}
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md flex items-center justify-between">
+          <div className="flex items-center">
+            <Check className="h-5 w-5 mr-2" />
+            {successMessage}
+          </div>
+          <button
+            onClick={() => setSuccessMessage(null)}
+            className="text-green-400 hover:text-green-600"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Global Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md flex items-center justify-between">
+          <div className="flex items-center">
+            <X className="h-5 w-5 mr-2" />
+            {error}
+          </div>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-600"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* Tab Navigation */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">

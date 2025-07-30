@@ -197,6 +197,7 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
             house_rules: formData.houseRules || '',
             emergency_contacts: formData.emergencyContacts || '',
             template_id: formData.templateId || 'modern-blue',
+            facilities: formData.facilities || [],
             updated_at: new Date().toISOString()
           })
           .eq('id', propertyId)
@@ -222,6 +223,7 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
             house_rules: formData.houseRules || '',
             emergency_contacts: formData.emergencyContacts || '',
             template_id: formData.templateId || 'modern-blue',
+            facilities: formData.facilities || [],
             is_published: true, // Assuming published after payment
             website_url: null // Will be generated later
           })

@@ -105,12 +105,29 @@ export const AdminPanel: React.FC = () => {
   const [showAddProperty, setShowAddProperty] = useState(false);
   const [editingProperty, setEditingProperty] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [editingLocalInfo, setEditingLocalInfo] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [userFormError, setUserFormError] = useState<string | null>(null);
   const [localInfoFormError, setLocalInfoFormError] = useState<string | null>(null);
   const [propertyFormError, setPropertyFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [editLocalInfoData, setEditLocalInfoData] = useState({
+    name: '',
+    category: 'restaurant' as const,
+    address: '',
+    phone: '',
+    website: '',
+    description: '',
+    city: '',
+    country: '',
+    verified: false,
+    rating: '',
+    opening_hours: '',
+    is24Hours: false,
+    openTime: '09:00',
+    closeTime: '17:00'
+  });
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
@@ -386,6 +403,104 @@ export const AdminPanel: React.FC = () => {
     } catch (err) {
       console.error('Error adding local info:', err);
       setLocalInfoFormError(t('admin.failedToAdd') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const startEditLocalInfo = (info: LocalInfo) => {
+    setEditingLocalInfo(info.id);
+    setEditLocalInfoData({
+      name: info.name,
+      category: info.category as any,
+      address: info.address,
+      phone: info.phone || '',
+      website: info.website || '',
+      description: info.description,
+      city: info.city,
+      country: info.country,
+      verified: info.verified,
+      rating: info.rating ? info.rating.toString() : '',
+      opening_hours: info.opening_hours || '',
+      is24Hours: info.opening_hours === '24/7',
+      openTime: info.opening_hours && info.opening_hours !== '24/7' ? info.opening_hours.split(' - ')[0] || '09:00' : '09:00',
+      closeTime: info.opening_hours && info.opening_hours !== '24/7' ? info.opening_hours.split(' - ')[1] || '17:00' : '17:00'
+    });
+  };
+
+  const cancelEditLocalInfo = () => {
+    setEditingLocalInfo(null);
+    setLocalInfoFormError(null);
+    setEditLocalInfoData({
+      name: '',
+      category: 'restaurant',
+      address: '',
+      phone: '',
+      website: '',
+      description: '',
+      city: '',
+      country: '',
+      verified: false,
+      rating: '',
+      opening_hours: '',
+      is24Hours: false,
+      openTime: '09:00',
+      closeTime: '17:00'
+    });
+  };
+
+  const updateLocalInfo = async () => {
+    setLocalInfoFormError(null);
+    setSuccessMessage(null);
+    
+    // Validate required fields
+    if (!editLocalInfoData.name || !editLocalInfoData.address || !editLocalInfoData.city || !editLocalInfoData.country || !editLocalInfoData.description) {
+      setLocalInfoFormError(t('admin.fillRequiredFields'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Format opening hours
+      let openingHours = '';
+      if (editLocalInfoData.is24Hours) {
+        openingHours = '24/7';
+      } else if (editLocalInfoData.openTime && editLocalInfoData.closeTime) {
+        openingHours = `${editLocalInfoData.openTime} - ${editLocalInfoData.closeTime}`;
+      }
+
+      const { error } = await supabase
+        .from('local_info')
+        .update({
+          name: editLocalInfoData.name,
+          category: editLocalInfoData.category,
+          address: editLocalInfoData.address,
+          phone: editLocalInfoData.phone || null,
+          website: editLocalInfoData.website || null,
+          description: editLocalInfoData.description,
+          city: editLocalInfoData.city,
+          country: editLocalInfoData.country,
+          verified: editLocalInfoData.verified,
+          rating: editLocalInfoData.rating ? parseFloat(editLocalInfoData.rating) : null,
+          opening_hours: openingHours || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingLocalInfo);
+
+      if (error) throw error;
+
+      // Reload data
+      await loadData();
+      
+      // Reset form
+      cancelEditLocalInfo();
+      setSuccessMessage('Local information updated successfully');
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (err) {
+      console.error('Error updating local info:', err);
+      setLocalInfoFormError(t('admin.failedToUpdate') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
       setIsSubmitting(false);
     }

@@ -192,6 +192,23 @@ export default {
   'admin.missingRequiredColumns': 'Ontbrekende verplichte kolommen: {columns}',
   'admin.templateColumns': 'Naam,Categorie,Adres,Telefoon,Website,Beschrijving,Stad,Land,Beoordeling,Openingstijden,Geverifieerd',
 
+  // User Management
+  'admin.addUser': 'Gebruiker Toevoegen',
+  'admin.addUserForm': 'Nieuwe Gebruiker Toevoegen',
+  'admin.fullName': 'Volledige Naam',
+  'admin.emailAddress': 'E-mailadres',
+  'admin.password': 'Wachtwoord',
+  'admin.confirmPassword': 'Bevestig Wachtwoord',
+  'admin.userRole': 'Gebruikersrol',
+  'admin.owner': 'Eigenaar',
+  'admin.admin': 'Beheerder',
+  'admin.createUser': 'Gebruiker Aanmaken',
+  'admin.creating': 'Aanmaken...',
+  'admin.userCreated': 'Gebruiker succesvol aangemaakt',
+  'admin.failedToCreateUser': 'Kon gebruiker niet aanmaken',
+  'admin.passwordsNotMatch': 'Wachtwoorden komen niet overeen',
+  'admin.fillAllFields': 'Vul alle verplichte velden in',
+
   // Templates
   'templates.modernBlue': 'Modern Blauw',
   'templates.classicGreen': 'Klassiek Groen',

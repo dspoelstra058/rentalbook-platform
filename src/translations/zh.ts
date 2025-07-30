@@ -192,6 +192,23 @@ export default {
   'admin.missingRequiredColumns': '缺少必需列：{columns}',
   'admin.templateColumns': '名称,类别,地址,电话,网站,描述,城市,国家,评分,营业时间,已验证',
 
+  // User Management
+  'admin.addUser': '添加用户',
+  'admin.addUserForm': '添加新用户',
+  'admin.fullName': '全名',
+  'admin.emailAddress': '邮箱地址',
+  'admin.password': '密码',
+  'admin.confirmPassword': '确认密码',
+  'admin.userRole': '用户角色',
+  'admin.owner': '所有者',
+  'admin.admin': '管理员',
+  'admin.createUser': '创建用户',
+  'admin.creating': '创建中...',
+  'admin.userCreated': '用户创建成功',
+  'admin.failedToCreateUser': '创建用户失败',
+  'admin.passwordsNotMatch': '密码不匹配',
+  'admin.fillAllFields': '请填写所有必填字段',
+
   // Templates
   'templates.modernBlue': '现代蓝色',
   'templates.classicGreen': '经典绿色',

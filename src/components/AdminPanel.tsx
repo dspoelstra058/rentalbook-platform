@@ -92,9 +92,17 @@ export const AdminPanel: React.FC = () => {
   // Form states
   const [showAddLocalInfo, setShowAddLocalInfo] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showAddUser, setShowAddUser] = useState(false);
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: 'owner' as 'owner' | 'admin'
+  });
   const [newLocalInfo, setNewLocalInfo] = useState({
     name: '',
     category: 'restaurant' as const,
@@ -182,6 +190,69 @@ export const AdminPanel: React.FC = () => {
     } catch (err) {
       console.error('Error updating user role:', err);
       alert('Failed to update user role');
+    }
+  };
+
+  const addUser = async () => {
+    // Validate required fields
+    if (!newUser.name || !newUser.email || !newUser.password || !newUser.confirmPassword) {
+      alert(t('admin.fillAllFields'));
+      return;
+    }
+
+    // Check password match
+    if (newUser.password !== newUser.confirmPassword) {
+      alert(t('admin.passwordsNotMatch'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Create user in Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: newUser.email,
+        password: newUser.password,
+        user_metadata: {
+          name: newUser.name
+        }
+      });
+
+      if (authError) throw authError;
+
+      if (!authData.user) {
+        throw new Error('No user returned from auth creation');
+      }
+
+      // Create user profile in users table
+      const { error: profileError } = await supabase
+        .from('users')
+        .insert({
+          id: authData.user.id,
+          email: newUser.email,
+          name: newUser.name,
+          role: newUser.role
+        });
+
+      if (profileError) throw profileError;
+
+      // Reload data
+      await loadData();
+      
+      // Reset form
+      setNewUser({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role: 'owner'
+      });
+      setShowAddUser(false);
+      alert(t('admin.userCreated'));
+    } catch (err) {
+      console.error('Error creating user:', err);
+      alert(t('admin.failedToCreateUser') + ': ' + (err instanceof Error ? err.message : 'Unknown error'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -512,12 +583,92 @@ export const AdminPanel: React.FC = () => {
 
   const renderUsers = () => (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.userManagement')}</h2>
-        <p className="text-gray-600">Manage platform users and their roles</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.userManagement')}</h2>
+          <p className="text-gray-600">Manage platform users and their roles</p>
+        </div>
+        <button
+          onClick={() => setShowAddUser(true)}
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          {t('admin.addUser')}
+        </button>
       </div>
 
+      {/* Add User Form */}
+      {showAddUser && (
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.addUserForm')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder={`${t('admin.fullName')} *`}
+              value={newUser.name}
+              onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="email"
+              placeholder={`${t('admin.emailAddress')} *`}
+              value={newUser.email}
+              onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="password"
+              placeholder={`${t('admin.password')} *`}
+              value={newUser.password}
+              onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="password"
+              placeholder={`${t('admin.confirmPassword')} *`}
+              value={newUser.confirmPassword}
+              onChange={(e) => setNewUser({...newUser, confirmPassword: e.target.value})}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <select
+              value={newUser.role}
+              onChange={(e) => setNewUser({...newUser, role: e.target.value as 'owner' | 'admin'})}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="owner">{t('admin.owner')}</option>
+              <option value="admin">{t('admin.admin')}</option>
+            </select>
+          </div>
+          
+          <div className="flex justify-end space-x-2 mt-4">
+            <button
+              onClick={() => setShowAddUser(false)}
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              {t('admin.cancel')}
+            </button>
+            <button
+              onClick={addUser}
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                  {t('admin.creating')}
+                </>
+              ) : t('admin.createUser')}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-sm border">
+
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">{t('admin.allUsers')}</h3>
         </div>

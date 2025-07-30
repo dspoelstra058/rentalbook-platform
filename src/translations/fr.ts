@@ -192,6 +192,23 @@ export default {
   'admin.missingRequiredColumns': 'Colonnes requises manquantes: {columns}',
   'admin.templateColumns': 'Nom,Catégorie,Adresse,Téléphone,Site Web,Description,Ville,Pays,Note,Heures d\'Ouverture,Vérifié',
 
+  // User Management
+  'admin.addUser': 'Ajouter Utilisateur',
+  'admin.addUserForm': 'Ajouter Nouvel Utilisateur',
+  'admin.fullName': 'Nom Complet',
+  'admin.emailAddress': 'Adresse E-mail',
+  'admin.password': 'Mot de Passe',
+  'admin.confirmPassword': 'Confirmer Mot de Passe',
+  'admin.userRole': 'Rôle Utilisateur',
+  'admin.owner': 'Propriétaire',
+  'admin.admin': 'Administrateur',
+  'admin.createUser': 'Créer Utilisateur',
+  'admin.creating': 'Création...',
+  'admin.userCreated': 'Utilisateur créé avec succès',
+  'admin.failedToCreateUser': 'Échec de la création de l\'utilisateur',
+  'admin.passwordsNotMatch': 'Les mots de passe ne correspondent pas',
+  'admin.fillAllFields': 'Veuillez remplir tous les champs obligatoires',
+
   // Templates
   'templates.modernBlue': 'Bleu Moderne',
   'templates.classicGreen': 'Vert Classique',

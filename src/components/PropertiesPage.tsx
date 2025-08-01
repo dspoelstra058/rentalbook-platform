@@ -4,7 +4,7 @@ import { Plus, Eye, Edit, Trash2, ExternalLink, Download, BarChart3, Palette, Ho
 import { useLanguage } from '../contexts/LanguageContext';
 import { Property } from '../types';
 import { templates } from '../utils/data';
-import { PDFGenerator } from '../utils/pdfGenerator';
+import { EnhancedPDFGenerator } from '../utils/enhancedPDFGenerator';
 import { TemplatePreview } from './TemplatePreview';
 import { ConfirmationModal } from './ConfirmationModal';
 import { supabase } from '../utils/supabase';
@@ -98,8 +98,22 @@ export const PropertiesPage: React.FC = () => {
     setIsGeneratingPDF(true);
     try {
       const template = templates.find(t => t.id === property.templateId) || templates[0];
-      const pdfGenerator = new PDFGenerator(property, [], template);
-      await pdfGenerator.generatePDF();
+      // Load PDF layout template (use default for now)
+      const { data: layoutTemplates } = await supabase
+        .from('pdf_layout_templates')
+        .select('*')
+        .eq('is_default', true)
+        .limit(1);
+      
+      const layoutTemplate = layoutTemplates?.[0];
+      const pdfTemplate = layoutTemplate?.template || template.pdfTemplate;
+      
+      if (pdfTemplate) {
+        const pdfGenerator = new EnhancedPDFGenerator(property, [], pdfTemplate);
+        await pdfGenerator.generatePDF();
+      } else {
+        alert('No PDF template available. Please contact administrator.');
+      }
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');

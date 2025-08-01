@@ -19,9 +19,15 @@ class AuthService {
 
     // Listen for auth changes
     supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        await this.loadUserProfile(session.user);
-      } else if (event === 'SIGNED_OUT') {
+      try {
+        if (event === 'SIGNED_IN' && session?.user) {
+          await this.loadUserProfile(session.user);
+        } else if (event === 'SIGNED_OUT') {
+          this.currentUser = null;
+        }
+      } catch (error) {
+        console.error('Auth state change error:', error);
+        // Reset user state on error to prevent inconsistent state
         this.currentUser = null;
       }
     });
@@ -200,6 +206,11 @@ class AuthService {
     
     while (!this.currentUser && (Date.now() - startTime) < maxWait) {
       await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    // If user still not loaded after timeout, throw an error
+    if (!this.currentUser) {
+      throw new Error('User profile failed to load within timeout period');
     }
   }
 

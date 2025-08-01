@@ -101,6 +101,7 @@ export interface Database {
           name: string;
           category: 'doctor' | 'pharmacy' | 'supermarket' | 'restaurant' | 'hospital' | 'attraction' | 'beach' | 'activity';
           address: string;
+          zip_code: string | null;
           phone: string | null;
           website: string | null;
           description: string;
@@ -117,6 +118,7 @@ export interface Database {
           name: string;
           category: 'doctor' | 'pharmacy' | 'supermarket' | 'restaurant' | 'hospital' | 'attraction' | 'beach' | 'activity';
           address: string;
+          zip_code?: string | null;
           phone?: string | null;
           website?: string | null;
           description: string;

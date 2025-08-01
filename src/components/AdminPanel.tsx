@@ -115,14 +115,10 @@ export const AdminPanel: React.FC = () => {
 
   const loadUsers = async () => {
     try {
-      console.log('Loading all users...');
-      
       const { data: usersData, error: usersError } = await supabase
         .from('users')
         .select('*')
         .order('created_at', { ascending: false });
-
-      console.log('Users query result:', { data: usersData, error: usersError });
 
       if (usersError) {
         console.error('Error loading users:', usersError);
@@ -138,7 +134,6 @@ export const AdminPanel: React.FC = () => {
         createdAt: new Date(user.created_at)
       }));
 
-      console.log('Transformed users:', transformedUsers);
       setUsers(transformedUsers);
     } catch (err) {
       console.error('Failed to load users:', err);

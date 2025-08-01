@@ -256,8 +256,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
         console.error(`Error ${isEdit ? 'updating' : 'creating'} property:`, error);
         throw new Error(error.message);
       }
-
-      console.log(`Property ${isEdit ? 'updated' : 'created'} successfully:`, data);
       
       // TODO: Save selected local info associations if needed
       // This would require a junction table between properties and local_info
@@ -285,8 +283,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
 
       setLoadingLocalInfo(true);
       try {
-        console.log('Loading local info for:', formData.city, formData.country);
-        
         const { data, error } = await supabase
           .from('local_info')
           .select('*')
@@ -295,13 +291,10 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
           .eq('verified', true)
           .order('name');
 
-        console.log('Supabase query result:', { data, error });
-
         if (error) {
           console.error('Error loading local info:', error);
           setAvailableLocalInfo([]);
         } else {
-          console.log('Found local info entries:', data?.length || 0);
           // Transform database data to LocalInfo interface
           const transformedData: LocalInfo[] = (data || []).map(item => ({
             id: item.id,
@@ -358,7 +351,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
 
   const handleImageUpload = (type: 'front' | 'general' | 'back', index?: number) => {
     // TODO: Implement image upload functionality
-    console.log('Upload image for:', type, index);
   };
 
   const removeImage = (type: 'front' | 'general' | 'back', index?: number) => {
@@ -438,7 +430,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
                   type="text"
                   value={formData.city}
                   onChange={(e) => {
-                    console.log('City changed to:', e.target.value);
                     updateFormData({ city: e.target.value });
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -452,7 +443,6 @@ export const PropertyWizard: React.FC<PropertyWizardProps> = ({ isEdit = false }
                 <select
                   value={formData.country}
                   onChange={(e) => {
-                    console.log('Country changed to:', e.target.value);
                     updateFormData({ country: e.target.value });
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

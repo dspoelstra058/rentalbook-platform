@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Users, Database, Settings, Plus, Edit, Trash2, Upload, Download, Eye, EyeOff, Search, Filter } from 'lucide-react';
+import { Users, Database, Settings, Plus, Edit, Trash2, Upload, Download, Eye, EyeOff, Search, Filter, FileText, Layout } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { User, LocalInfo } from '../types';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
 import { ConfirmationModal } from './ConfirmationModal';
+import { PDFLayoutManager } from './PDFLayoutManager';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 
@@ -90,6 +91,8 @@ export const AdminPanel: React.FC = () => {
       setActiveTab('users');
     } else if (path.includes('/local-info')) {
       setActiveTab('local-info');
+    } else if (path.includes('/pdf-layouts')) {
+      setActiveTab('pdf-layouts');
     } else if (path.includes('/settings')) {
       setActiveTab('settings');
     } else {
@@ -522,6 +525,7 @@ export const AdminPanel: React.FC = () => {
   const tabs = [
     { id: 'users', label: t('admin.userManagement'), icon: Users },
     { id: 'local-info', label: t('admin.localInfoManagement'), icon: Database },
+    { id: 'pdf-layouts', label: 'PDF Layout Manager', icon: FileText },
     { id: 'settings', label: t('admin.platformSettings'), icon: Settings }
   ];
 
@@ -780,6 +784,9 @@ export const AdminPanel: React.FC = () => {
             </div>
           </div>
         );
+
+      case 'pdf-layouts':
+        return <PDFLayoutManager />;
 
       case 'settings':
         return (

@@ -11,6 +11,8 @@ import { AdminPanel } from './components/AdminPanel';
 import { PropertiesPage } from './components/PropertiesPage';
 import { SettingsPage } from './components/SettingsPage';
 import { Layout } from './components/Layout';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { TestApp } from './components/TestApp';
 import { authService } from './utils/auth';
 
 const AppContent: React.FC = () => {
@@ -18,8 +20,22 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      await authService.waitForInitialization();
-      setIsLoading(false);
+      try {
+        // Add a timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Auth initialization timeout')), 5000)
+        );
+        
+        await Promise.race([
+          authService.waitForInitialization(),
+          timeoutPromise
+        ]);
+      } catch (error) {
+        console.warn('Auth initialization failed or timed out:', error);
+        // Continue anyway to show the app
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     initializeAuth();
@@ -161,9 +177,15 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean 
 };
 
 function App() {
-  return (
-    <AppContent />
-  );
+  // Temporarily use TestApp to verify React is working
+  // Remove this and uncomment the line below once Supabase is set up
+  return <TestApp />;
+  
+  // return (
+  //   <ErrorBoundary>
+  //     <AppContent />
+  //   </ErrorBoundary>
+  // );
 }
 
 export default App;

@@ -6,7 +6,7 @@ import { User, LocalInfo } from '../types';
 import { supabase } from '../utils/supabase';
 import { authService } from '../utils/auth';
 import { ConfirmationModal } from './ConfirmationModal';
-import { PDFLayoutManager } from './PDFLayoutManager';
+import { SimplePDFLayoutManager } from './SimplePDFLayoutManager';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 
@@ -786,7 +786,7 @@ export const AdminPanel: React.FC = () => {
         );
 
       case 'pdf-layouts':
-        return <PDFLayoutManager />;
+        return <SimplePDFLayoutManager />;
 
       case 'settings':
         return (

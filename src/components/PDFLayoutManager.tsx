@@ -52,12 +52,18 @@ export const PDFLayoutManager: React.FC<PDFLayoutManagerProps> = ({ onBack }) =>
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-
-      setTemplates(data || []);
+      if (error) {
+        console.warn('Database table not found, using fallback templates:', error);
+        // Fallback to empty array if table doesn't exist
+        setTemplates([]);
+      } else {
+        setTemplates(data || []);
+      }
     } catch (err) {
       console.error('Error loading PDF templates:', err);
-      setError('Failed to load PDF templates');
+      // Use fallback templates
+      setTemplates([]);
+      setError('Database not ready. Please run the migration first.');
     } finally {
       setLoading(false);
     }
@@ -116,13 +122,20 @@ export const PDFLayoutManager: React.FC<PDFLayoutManagerProps> = ({ onBack }) =>
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.warn('Database not available, storing template locally:', error);
+        // Store locally for now
+        setTemplates(prev => [newTemplate, ...prev]);
+        setShowCreateModal(false);
+        setError('Database not ready. Template created locally only.');
+        return;
+      }
 
       setTemplates(prev => [data, ...prev]);
       setShowCreateModal(false);
     } catch (err) {
       console.error('Error creating template:', err);
-      setError('Failed to create template');
+      setError('Failed to create template. Please check database connection.');
     }
   };
 
